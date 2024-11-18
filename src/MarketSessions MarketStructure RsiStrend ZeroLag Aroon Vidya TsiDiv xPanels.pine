@@ -1,0 +1,235 @@
+/// ╔═══════════════════════════════════╗
+/// ║	Globals							║
+/// ╚═══════════════════════════════════╝
+
+//// ─────────────────────────────────────────────────────────────────────
+
+/// ───────────────────────
+/// ─── Types
+/// ───────────────────────
+
+strGlobalTimeFrame						= input.string 	(defval = "Grafico",	title = "Timeframe",	group = "Global Timeframe",
+			  options					=				["Grafico", "5 min", "15 min", "30 min", "1 Hora", "2 Horas", "3 Horas", "4 Horas"])
+insGlobalTFCoefficient					= input.int		(defval = "2",			title = "Coef",			group = "Global Timeframe",				minval = "1",	maxval = "5",	step = 1)
+
+/// ───────────────────────
+/// ─── Types
+/// ───────────────────────
+
+type globalTypeOHL
+		float O							= open
+		float H							= high
+		float L							= low
+		float C							= close
+		float V							= volume
+		int   I							= bar_index
+
+/// ───────────────────────
+/// ─── Functions
+/// ───────────────────────
+
+/// ─── function timeframe
+FunGlobalTimeFrame(_timeframe) =>
+	switch _timeframe
+		"Grafico"						=> "Chart"
+		"1 seg"							=> "S"	
+		"5 seg"							=> "5S"
+		"10 seg"						=> "10S"
+		"15 seg"						=> "15S"
+		"30 seg"						=> "30S"
+		"1 min"							=> "1"	
+		"3 min"							=> "3"	
+		"5 min"							=> "5"
+		"15 min"						=> "15"
+		"30 min"						=> "30"
+		"1 Hora"						=> "60"
+		"2 Horas"						=> "120"
+		"3 Horas"						=> "180"
+		"4 Horas"						=> "240"
+		"8 horas"						=> "480"
+		"Dia"							=> "D"
+		"1 Dia"							=> "1D"
+		"Semana"						=> "W"
+		"1 Semana"						=> "1W"
+		"Mes"							=> "M"
+		"1 Mes"							=> "1M"
+
+/// ─── function location vertical
+FunGlobalVertical(_vertical) =>
+	switch _vertical
+		"arriba"						=> "top"
+		"medio"							=> "middle"
+		"abajo"							=> "bottom"
+
+/// ─── function location horizontal
+FunGlobalHorizontal(_horizontal) =>
+	switch _horizontal
+
+		"izquierda"						=> "left"
+		"centro"						=> "center"
+		"derecha"						=> "right"
+
+/// ─── function position
+FunGlobalPosition(_position) =>
+	switch _position
+		"Externo"						=> "outside"
+		"Interno"						=> "inside"
+
+/// ─── function text size
+FunGlobalTextSize(_textsize) =>
+	switch _textsize
+		"Mini"							=> size.tiny
+		"Pequeño"						=> size.small
+		"Normal"						=> size.normal
+		"Grande"						=> size.large
+		"Enorme"						=> size.huge
+		"Auto"							=> size.auto
+
+/// ─── function line style
+FunGlobalLineStyle(_linestyle) =>
+	switch _linestyle
+		'⎯⎯⎯⎯'							=> line.style_solid
+		'----'							=> line.style_dashed
+		'····'							=> line.style_dotted
+
+/// ─── function Days of Week
+FunGlobalDayofWeek(_days) =>
+	switch _days
+		1								=> 'Domingo'
+		2								=> 'Lunes'
+		3								=> 'Martes'
+		4								=> 'Miercoles'
+		5								=> 'Jueves'
+		6								=> 'Viernes'
+		7								=> 'Sabado'
+
+/// ─── function Months of Year
+FunGlobalDayofWeek(_months) =>
+	switch _months
+		1								=> 'Enero'
+		2								=> 'Febrero'
+		3								=> 'Marzo'
+		4								=> 'Abril'
+		5								=> 'Mayo'
+		6								=> 'Junio'
+		7								=> 'Julio'
+		8								=> 'Abosto'
+		9								=> 'Septiembre'
+		10								=> 'Octubre'
+		11								=> 'Noviembre'
+		12								=> 'Diciembre'
+
+/// ─── function Quarters
+FunGlobalDayofWeek(_quarters) =>
+	switch _quarters
+		1								=> 'Q1'
+		2								=> 'Q2'
+		3								=> 'Q3'
+		4								=> 'Q4'
+
+/// ─── function Timezone
+FunGlobalTimeZone(_timezone) =>
+	switch _timezone
+		"NYSE"							=> "UTC-5"
+		"New York"						=> "America/New_York"
+		"Chicago"						=> "America/Chicago"
+		"Londres"						=> "Europe/London"
+		"Tokyo"							=> "Asia/Tokyo"
+		"Shanghai"						=> "Asia/Shanghai"
+		"Sydney"						=> "Australia/Sydney"
+		"Argentina"						=> "America/Argentina/Buenos_Aires"
+
+
+/// ─── function calculate MA
+FunGlobalCalculateMA(_source, _length, _type) =>
+	switch _type
+		"SMA"							=> ta.sma	(_source, _length)
+		"HMA"							=> ta.hma	(_source, _length)
+		"EMA"							=> ta.ema	(_source, _length)
+		"SMMA"							=> ta.rma	(_source, _length)
+		"WMA"							=> ta.wma	(_source, _length)
+		"VWMA"							=> ta.vwma	(_source, _length)
+		"MFI"							=> ta.mfi	(_source, _length)
+
+/// ─── Function calculate timeframe range
+FunGlobalCalculateTimeframeRange(_coefficient, _timeframe) =>
+	_x									= 3
+	_mayor								= 480
+	_minor								= 15
+	_tonumber							= str.tonumber(_timeframe)
+	_operat_coeff						= _tonumber * _coefficient
+	_operat_minor						= _tonumber * _x
+	_toresult							= str.tonumber(_timeframe)
+
+	_conditional						= _tonumber >= _mayor ? _toresult : _tonumber <= _minor ? _operat_minor : _operat_coeff
+	str.tostring(_conditional)
+
+/// ─── Function create new table
+FunGlobalNewTable(_box, _col, _row, _width, _bgcolor, _txt, _txtcolor, _txthalign, _txtsize) =>
+	table.cell(table_id		= _box,
+		  column			= _col,
+		  row				= _row,
+		  width				= _width,
+		  bgcolor			= _bgcolor,
+		  text				= _txt,
+		  text_color		= _txtcolor,
+		  text_halign		= _txthalign,
+		  text_size			= _txtsize
+		  )
+
+/// ─── function Signal buy/sell
+FunGlobalSignal(_buy, _sell) =>
+	_buy ? "🟢⬈" : _sell ? "🔴⬊" : "⚪➞"
+
+/// ─── function Color buy/sell
+FunGlobalIfColor(_buy, _sell) =>
+	_buy ? _colorbuy : _sell ? _colorsell : _colorneutral
+
+/// ─── Function signal buy/sell
+FunGlobalSignalBuySell(_buy, _sell, _buy2, _sell2, _buy3, _sell3, _buy4, _sell4) =>
+	_if_buy								= _sell			> _sell3			and _sell2			> _sell4
+	_if_sell							= _buy			< _buy3				and _buy2			< _buy4
+	_if_color							= _if_sell	?	"🔴⬊"	:	_if_buy	?	"🟢⬈"	:	"⚪➞"
+
+	_cond_buy							= _buy >= 80
+	_cond_sell							= _sell <= 20
+
+	_signal_color						= _cond_buy ? colorTsiObsPnl_Buy : _cond_sell ? colorTsiObsPnl_Sell : colorTsiObsPnl_Neutral
+	_signal_opacity						= _buy >= 100 or _sell <= 0 ? 20 : _buy >= 80 or _sell <= 20 ? 40 : 65
+
+/// ─── function RSI calculate
+FunGlobalCalculateRSI(_source, _length) =>
+	_upmove					= math.max		(_source - _source[1], 0)
+	_downmove				= math.max		(_source[1] - _source, 0)
+	_upavg					= ta.rma		(_upmove, _length)
+	_downavg				= ta.rma		(_downmove, _length)
+	_crsi					= _downavg == 0 ? 100 : _upavg == 0 ? 0 : 100 - (100 / (1 + _upavg / _downavg))
+	_crsi
+
+/// ─── function table signal
+FunTsiObsPnlCalculateCellSignal(_col, _row, _title, _var, _var2, _var3, _var4, _ma) =>
+	/// ─── signal buy/sell
+	_if_buy								= _var		> _var3		and _var2		> _var4		and	_var4 < 20
+	_if_sell							= _var		< _var3		and _var2		< _var4		and _var4 > 80
+	_if_condition						= _if_sell	?	"🔴⬊"	:	_if_buy	?	"🟢⬈"	:	"⚪➞"
+
+	_signal_opacity						= _var >= 100 or _var <= 0 ? 20 : _var >= 80 or _var <= 20 ? 40 : 65
+
+	/// ─── table
+	_cell_color							= _var >= 80 ? colorTsiObsPnl_Sell : _var <= 20 ? colorTsiObsPnl_Buy : colorTsiObsPnl_Neutral
+	_opacity							= _var >= 100 or _var <= 0 ? 20 : _var >= 85 or _var <= 15 ? 40 : 65
+	_cell_text							= _title + "\n" + str.tostring(_var, "#.00") + "\n" +_if_condition
+
+	table.cell							(vTsiPnlNewTableSignal, _col, _row, _cell_text,
+		  bgcolor						= color.new(_cell_color, _signal_opacity),
+		  text_size						= stTsiObsPnl_TextSize,
+		  text_color					= colorTsiObsPnl_Text,
+		  width							= 6)
+
+/// ───────────────────────
+/// ─── Instances
+/// ───────────────────────
+
+globalOHL								= globalTypeOHL.new()
+
+//// ─────────────────────────────────────────────────────────────────────
