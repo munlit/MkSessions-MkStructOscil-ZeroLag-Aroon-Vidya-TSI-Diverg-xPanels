@@ -1,0 +1,134 @@
+
+// © ChartPrime
+
+//@version=5
+indicator("Zero-Lag MA Trend Levels [ChartPrime]", overlay = true)
+
+/// ───────────────────────
+/// ＩＮＰＵＴＳ
+/// ───────────────────────
+
+showZeLag_level					= input.bool	(true,			title = "Mostrar Zero Trends")		// Toggle to show trend levels
+zeLag_length					= input.int		(15,			title = "Longitud")					// Length for the moving average calculations
+
+// Colors for the trend levels
+co_zeLag_up						= input.color	(#30d453,		title = "Compra",		group = "Colors",		inline = "i")
+co_zeLag_dn						= input.color	(#4043f1,		title = "Venta",		group = "Colors",		inline = "i")
+co_zeLag_signal					= input.color	(#ffffff,		title = "Señal",		group = "Colors",		inline = "i")
+co_zeLag_text					= input.color	(#ffff00,		title = "Texto",		group = "Colors",		inline = "i")
+
+var bZeLag_BOX					= box(na) // Variable to store the box
+series float iZeLag_ATR			= ta.atr(200) // Average True Range (ATR) for trend levels
+
+/// ────────────■
+/// ─── Types
+/// ────────────■
+
+type globalTypeOHL
+	float O						= open
+	float H						= high
+	float L						= low
+	float C						= close
+	float V						= volume
+	int   I						= bar_index
+
+/// ─────────────×
+/// ─── Instances
+/// ─────────────◙
+
+globOHL							= globalTypeOHL.new()
+
+/// ───────────────────────
+/// ＣＡＬＣＵＬＡＴＩＯＮＳ
+/// ───────────────────────
+
+series float iZeLag_EMA			= ta.ema(globOHL.C, zeLag_length) // EMA of the closing price
+series float iZeLag_correction	= globOHL.C + (globOHL.C - iZeLag_EMA) // Correction factor for zero-lag calculation
+series float iZeLag_ZLMA		= ta.ema(iZeLag_correction, zeLag_length) // Zero-Lag Moving Average (ZLMA)
+
+bool  zeLag_signal_buy			= ta.crossover(iZeLag_ZLMA, iZeLag_EMA) // Signal for bullish crossover
+bool  zeLag_signal_sell			= ta.crossunder(iZeLag_ZLMA, iZeLag_EMA) // Signal for bearish crossunder
+
+// Determine the color of ZLMA based on its direction
+co_zeLag_ZLMA					= iZeLag_ZLMA > iZeLag_ZLMA[3] ? co_zeLag_up : iZeLag_ZLMA < iZeLag_ZLMA[3] ? co_zeLag_dn : na
+co_zeLag_EMA					= iZeLag_EMA < iZeLag_ZLMA ? co_zeLag_up : co_zeLag_dn // Determine the EMA color
+
+/// ───────────────────────
+/// ＰＬＯＴ
+/// ───────────────────────
+
+// Plot the Zero-Lag Moving Average
+zeLag_plot_ZLMA					= plot(iZeLag_ZLMA,								color = co_zeLag_ZLMA,			linewidth = 1)					// Plot ZLMA
+zeLag_plot_EMA					= plot(iZeLag_EMA,								color = co_zeLag_EMA,			linewidth = 1)					// Plot EMA
+fill(zeLag_plot_ZLMA, zeLag_plot_EMA, iZeLag_ZLMA, iZeLag_EMA, 					color.new(co_zeLag_ZLMA, 80),	color.new(co_zeLag_EMA, 80))	// Fill between ZLMA and EMA
+
+// Method to draw a box on the chart
+method FUN_zeLag_draw_box(color _color, top, _bottom, price) =>
+	box.new(
+			 bar_index, top, bar_index, _bottom, _color, 1, 
+			 bgcolor			= color.new(_color, 90), 
+			 text				= str.tostring(math.round(price, 2)), 
+			 text_size			= size.tiny,
+			 text_color			= chart.fg_color,
+			 text_halign		= text.align_right
+			 )
+
+// Logic to draw trend levels as boxes on the chart
+if showZeLag_level
+	bool _check_signals			= zeLag_signal_buy or zeLag_signal_sell // Check if there is an up or down signal
+
+	switch
+		// Draw a box when a bullish signal is detected
+		zeLag_signal_buy	=> bZeLag_BOX		:= co_zeLag_up.FUN_zeLag_draw_box(iZeLag_ZLMA, iZeLag_ZLMA - iZeLag_ATR, globOHL.C)
+
+		// Draw a box when a bearish signal is detected
+		zeLag_signal_sell	=> bZeLag_BOX		:= co_zeLag_dn.FUN_zeLag_draw_box(iZeLag_ZLMA + iZeLag_ATR, iZeLag_ZLMA, globOHL.C)
+
+	switch
+		// Extend the right side of the box if no new signal is detected
+		not zeLag_signal_buy or not zeLag_signal_sell => bZeLag_BOX.set_right(bar_index + 4)  
+		=> bZeLag_BOX := box(na) // Otherwise, reset the box
+
+	switch
+		// Add a downward label when price crosses below the bottom of the box
+		ta.crossunder(high, bZeLag_BOX.get_bottom()) and not _check_signals[1] and not _check_signals and iZeLag_EMA > iZeLag_ZLMA =>
+			label.new(bar_index - 1, high[1],
+				  text			= "▼",
+				  color			= co_zeLag_signal,
+				  textcolor		= co_zeLag_dn,
+				  style			= label.style_label_down)
+
+		// Add an upward label when price crosses above the top of the box
+		ta.crossover(low, bZeLag_BOX.get_top()) and not _check_signals and not _check_signals[1] and iZeLag_EMA < iZeLag_ZLMA =>
+			label.new(bar_index - 1, low[1],
+				  text			= "▲",
+				  color			= co_zeLag_signal,
+				  textcolor		= co_zeLag_up,
+				  style			= label.style_label_up)
+
+// Plot shapes for up and down signals
+plotshape(zeLag_signal_buy ? iZeLag_ZLMA : na,
+		  title					= "",
+		  style					= shape.diamond,
+		  location				= location.absolute,
+		  color					= co_zeLag_up,
+		  size					= size.tiny)
+
+plotshape(zeLag_signal_sell ? iZeLag_ZLMA : na,
+		  title					= "",
+		  style					= shape.diamond,
+		  location				= location.absolute,
+		  color					= co_zeLag_dn,
+		  size					= size.tiny)
+
+//	testing variables
+if barstate.islast
+	label.delete(
+		 label.new(bar_index + 10, iZeLag_ZLMA, 
+		//  label.new(bar_index + 10, high, 
+		 "Compra: " + str.tostring(iZeLag_ZLMA, format.mintick) + "\n" +
+		 "Venta: " + str.tostring(iZeLag_EMA, format.mintick),
+		 color					= color.new(#00ffaa, 50),
+		 style					= label.style_label_left, 
+		 textcolor				= chart.fg_color
+		 )[1])
