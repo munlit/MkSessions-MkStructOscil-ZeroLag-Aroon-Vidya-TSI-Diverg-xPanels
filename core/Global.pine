@@ -4,25 +4,95 @@
 
 //// ─────────────────────────────────────────────────────────────────────
 
+strGlobalExtendTooltip					= "Indicador TSI basado en tendencia"
+strGlobalOptionalTooltip				= "Configuración de temporalidad adicional"
+
 /// ───────────────────────
-/// ─── Types
+/// ─── Variables
 /// ───────────────────────
 
-strGlobalTimeFrame						= input.string 	(defval = "Grafico",	title = "Timeframe",	group = "Global Timeframe",
-			  options					=				["Grafico", "5 min", "15 min", "30 min", "1 Hora", "2 Horas", "3 Horas", "4 Horas"])
-insGlobalTFCoefficient					= input.int		(defval = "2",			title = "Coef",			group = "Global Timeframe",				minval = "1",	maxval = "5",	step = 1)
+globalTSIGroupTimeframe					= "Tsi & Divergences"
+// globalTSIGroupTimeframe					= "Temporalidad Global"
+showTsiMuDiTSIDivergs					= input.bool	(defval = true,			title = 'TSI & Divergences',			group = globalGroupTimeframe)
+showTsiMuDiTSIMultitimeframe			= input.bool	(defval = false,		title = "Multitimeframe",				group = globalGroupTimeframe,		tooltip = strGlobalOptionalTooltip)
+strGlobalMultiTimeFrame					= input.string 	(defval = "Grafico",	title = "Multi Timeframe",				group = globalGroupTimeframe,
+			  options					=				["Grafico", "15 min", "30 min", "1 Hora", "2 Horas", "3 Horas", "4 Horas", "1 Dia", "1 Semana", "1 Mes"])
+strGlobalColorSelector					= input.string 	(defval = "Allen",		title = "Color Selector",				group = globalGroupTimeframe,
+			  options					=				["Allen", "Ultr", "Mono"])
+			//   options					=				["Allen", "Ultr", "Inverse", "Classic", "Light", "Mono"])
+float insGlobalTFCoefficient			= 				2.3
 
 /// ───────────────────────
 /// ─── Types
 /// ───────────────────────
 
 type globalTypeOHL
-		float O							= open
-		float H							= high
-		float L							= low
-		float C							= close
-		float V							= volume
-		int   I							= bar_index
+	float O								= open
+	float H								= high
+	float L								= low
+	float C								= close
+	float V								= volume
+	int   I								= bar_index
+
+/// ───────────────────────
+/// ─── Switch
+/// ───────────────────────
+
+[_co_gbl_buy, _co_gbl_sell, _co_gbl_long, _co_gbl_short, _co_gbl_neutral, _co_gbl_extra, _co_gbl_white, _co_gbl_black, _co_gbl_txt_light, _co_gbl_txt_dark]	= switch	strGlobalColorSelector
+	"Allen"								=> [#33FFAC,		#CCF8FF,		#ADEB42,		#EA1889,		#CCF8FF,		#FDF43C,		#E6F7FF,		#121F3D,		#FBFD73,		#121F3D]
+	"Ultr"								=> [#00E7FD,		#FE0CB6,		#00E7FD,		#FE0CB6,		#121F3D,		#FDF43C,		#E6F7FF,		#0C1633,		#E6F7FF,		#121F3D]
+	"Light"								=> [#2962FF,		#F23645,		#2962FF,		#F23645,		#FCFF8F,		#5C818A,		#E6F7FF,		#0C1633,		#E6F7FF,		#121F3D]
+	"Inverse"							=> [#ADEB42,		#EA1889,		#33FFAC,		#CCF8FF,		#CCF8FF,		#FDF43C,		#E6F7FF,		#0C1633,		#E6F7FF,		#121F3D]
+	"Classic"							=> [#B1FF05,		#D11C36,		#B1FF05,		#D11C36,		#5C818A,		#FCFF8F,		#E6F7FF,		#0C1633,		#E6F7FF,		#121F3D]
+	"Mono"								=> [#CCF8FF,		#0C1633,		#CCF8FF,		#0C1633,		#676B79,		#FCFF8F,		#E6F7FF,		#0C1633,		#E6F7FF,		#121F3D]
+
+/// ───────────────────────
+/// ─── Switch
+/// ───────────────────────
+
+/// ─── switch line style
+string	_line_style					= switch _option_line_style
+	"───"								=> line.style_solid
+	"---"								=> line.style_dashed
+	"···"								=> line.style_dotted
+
+/// ─── switch position vertical
+string	_position_vertical			= switch _option_position_y
+	"Arriba"							=> "top"
+	"Medio"								=> "middle"
+	"Abajo"								=> "bottom"
+
+/// ─── switch position horizontal
+string	_position_horizontal		= switch _option_position_x
+
+	"Izquierda"							=> "left"
+	"Centro"							=> "center"
+	"Derecha"							=> "right"
+
+/// ─── switch position in/out
+string	_position_in				= switch _option_position_in
+	"Externo"							=> "outside"
+	"Interno"							=> "inside"
+
+/// ─── switch label size
+string	_label_size					= switch _option_label_size
+	"Auto"								=> size.auto
+	"Mini"								=> size.tiny
+	"Pequeño"							=> size.small
+	"Normal"							=> size.normal
+	"Grande"							=> size.large
+	"Enorme"							=> size.huge
+
+/// ─── switch session timezone
+string	_session					= switch _option_timezone
+	"NYSE"								=> "UTC-5"
+	"New York"							=> "America/New_York"
+	"Chicago"							=> "America/Chicago"
+	"Londres"							=> "Europe/London"
+	"Tokyo"								=> "Asia/Tokyo"
+	"Shanghai"							=> "Asia/Shanghai"
+	"Sydney"							=> "Australia/Sydney"
+	"Argentina"							=> "America/Argentina/Buenos_Aires"
 
 /// ───────────────────────
 /// ─── Functions
@@ -104,7 +174,7 @@ FunGlobalDayofWeek(_days) =>
 		7								=> 'Sabado'
 
 /// ─── function Months of Year
-FunGlobalDayofWeek(_months) =>
+FunGlobalDayofMonth(_months) =>
 	switch _months
 		1								=> 'Enero'
 		2								=> 'Febrero'
@@ -120,7 +190,7 @@ FunGlobalDayofWeek(_months) =>
 		12								=> 'Diciembre'
 
 /// ─── function Quarters
-FunGlobalDayofWeek(_quarters) =>
+FunGlobalQuarters(_quarters) =>
 	switch _quarters
 		1								=> 'Q1'
 		2								=> 'Q2'
@@ -184,7 +254,7 @@ FunGlobalSignal(_buy, _sell) =>
 
 /// ─── function Color buy/sell
 FunGlobalIfColor(_buy, _sell) =>
-	_buy ? _colorbuy : _sell ? _colorsell : _colorneutral
+	_buy ? _co_gbl_buy : _sell ? _co_gbl_sell : _co_gbl_neutral
 
 /// ─── Function signal buy/sell
 FunGlobalSignalBuySell(_buy, _sell, _buy2, _sell2, _buy3, _sell3, _buy4, _sell4) =>
@@ -200,12 +270,12 @@ FunGlobalSignalBuySell(_buy, _sell, _buy2, _sell2, _buy3, _sell3, _buy4, _sell4)
 
 /// ─── function RSI calculate
 FunGlobalCalculateRSI(_source, _length) =>
-	_upmove					= math.max		(_source - _source[1], 0)
-	_downmove				= math.max		(_source[1] - _source, 0)
-	_upavg					= ta.rma		(_upmove, _length)
-	_downavg				= ta.rma		(_downmove, _length)
-	_crsi					= _downavg == 0 ? 100 : _upavg == 0 ? 0 : 100 - (100 / (1 + _upavg / _downavg))
-	_crsi
+	_upmove								= math.max		(_source - _source[1], 0)
+	_downmove							= math.max		(_source[1] - _source, 0)
+	_upavg								= ta.rma		(_upmove, _length)
+	_downavg							= ta.rma		(_downmove, _length)
+	_calc_rsi							= _downavg == 0 ? 100 : _upavg == 0 ? 0 : 100 - (100 / (1 + _upavg / _downavg))
+	_calc_rsi
 
 /// ─── function table signal
 FunTsiObsPnlCalculateCellSignal(_col, _row, _title, _var, _var2, _var3, _var4, _ma) =>
