@@ -140,7 +140,7 @@ FunGlobalHorizontal(_horizontal) =>
 		"derecha"						=> "right"
 
 /// ─── function position
-FunGlobalPosition(_position) =>
+FunGlobalPositionIn(_position) =>
 	switch _position
 		"Externo"						=> "outside"
 		"Interno"						=> "inside"
@@ -220,6 +220,13 @@ FunGlobalCalculateMA(_source, _length, _type) =>
 		"WMA"							=> ta.wma	(_source, _length)
 		"VWMA"							=> ta.vwma	(_source, _length)
 		"MFI"							=> ta.mfi	(_source, _length)
+
+/// ─── function calculate ATR
+FusGlobalCalculateATR(_source, _atr_length) =>
+	_highest_high				= ta.highest(_source, _atr_length)
+	_lowest_low					= ta.lowest(_source, _atr_length)
+	_true_range					= na(_highest_high[1]) ? _highest_high - _lowest_low : math.max(_highest_high - _lowest_low, math.abs(_highest_high - _source[1]), math.abs(_lowest_low - _source[1]))
+	ta.rma(_true_range, _atr_length)
 
 /// ─── Function calculate timeframe range
 FunGlobalCalculateTimeframeRange(_coefficient, _timeframe) =>
