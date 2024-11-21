@@ -1,5 +1,7 @@
-
-// © ChartPrime
+/// ╔═══════════════════════════════╗
+/// ║	ZeroLag Trend				║
+/// ║	©	ChartPrime				║
+/// ╚═══════════════════════════════╝
 
 //@version=5
 indicator("Zero-Lag MA Trend Levels [ChartPrime]", overlay = true)

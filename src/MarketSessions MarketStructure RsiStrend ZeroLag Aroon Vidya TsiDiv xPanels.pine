@@ -2,18 +2,18 @@
 /// ║	Globals						║
 /// ╚═══════════════════════════════╝
 /// ╔═══════════════════════════════╗
-/// ║ 	Fx Market Sessions			║
-/// ╚═══════════════════════════════╝
+/// ║	Fx Market Sessions			║
 /// ╔═══════════════════════════════╗
-/// ║ 	Market Structure Oscilador	║
-/// ╚═══════════════════════════════╝
+/// ║	Market Structure Oscilador	║
 /// ╔═══════════════════════════════╗
-/// ║ 	RSI Supertrend				║
-/// ║ 	@	Allen	㔬				║
+/// ║	RSI Supertrend				║
+/// ╔═══════════════════════════════╗
+/// ║	ZeroLag Trend				║
+/// ║	@	Allen	㔬				║
 /// ╚═══════════════════════════════╝
 
 //@version=5
-indicator(title = 'FxMarketSessions & MarketStructureOscilador & Rsi Supertrend & ZeroLag & Aroon & Vidya & TSI Diverg & xPanels [🎱 Allen 㔬]',
+indicator(title							= 'FxMarketSessions & MarketStructureOscilador & Rsi Supertrend & ZeroLag & Aroon & Vidya & TSI Diverg & xPanels [🎱 Allen 㔬]',
 		  shorttitle            	    = 'MkSess MSOsc RsiST ZLag oon dya TSId xPanels [🎱 Allen 㔬]',
 		  overlay						= true,
 		  max_boxes_count				= 500,
@@ -26,41 +26,7 @@ indicator(title = 'FxMarketSessions & MarketStructureOscilador & Rsi Supertrend 
 //// ─────────────────────────────────────────────────────────────────────
 
 /// ───────────────────────
-/// ─── Colors
-/// ───────────────────────
-
-AmeTrGrayNickel							= #F1F1F1
-AmeTrBlueFrost							= #E1EEF9
-GraySwebSecondaryText					= #77708A
-ARoPrimary								= #0035FF
-BrLiYel10								= #FBFD73
-BrLiYel30								= #FDF43C
-BrLiYel40								= #FEF301
-WavBehPink20							= #FFB7FF
-WavBehFucsia50							= #DF36DF
-WavBehAqua50							= #0CF2F2
-VictSecPink50							= #E651CD
-VictSecFucsia50							= #EA1889
-MongoSky10								= #E3FCF7
-SurfePrimary							= #073742
-SurfePink500							= #FC84E1
-CitiAccentLightBlue						= #CCEEFF
-PlatziGreen30							= #ADEB42
-PlatziGreen40							= #85C638
-PlatziBlue50							= #24385B
-PlatziBlue70							= #121F3D
-PlatziBlue80							= #0C1633
-AllenSky10								= #CCF8FF
-AllenSky20								= #80F3EC
-AllenMint10								= #E0F9EF
-AllenMint20								= #9CFFD7
-AllenMint50								= #4FFFC0
-AllenMint60								= #33FFAC
-AllenWine60								= #E8114B
-AllenFucsia50							= #EA1889
-
-/// ───────────────────────
-/// ─── Variables
+/// ─── Globals
 /// ───────────────────────
 
 strGlobalExtendTooltip					= 'Indicador TSI basado en tendencia'
@@ -71,22 +37,38 @@ showTsiMuDiTSIDivergs					= input.bool	(defval = true,			title = 'TSI & Divergen
 showTsiMuDiTSIMultitimeframe			= input.bool	(defval = false,		title = 'Multitimeframe',				group = globalGroupTimeframe,		tooltip = strGlobalOptionalTooltip)
 strGlobalMultiTimeFrame					= input.string 	(defval = 'Grafico',	title = 'Multi Timeframe',				group = globalGroupTimeframe,
 			  options					=				['Grafico', '15 min', '30 min', '1 Hora', '2 Horas', '3 Horas', '4 Horas', '1 Dia', '1 Semana', '1 Mes'])
-strGlobalColorSelector					= input.string 	(defval = 'Allen',		title = 'Color Selector',				group = globalGroupTimeframe,
-			  options					=				['Allen', 'Ultr', 'Mono'])
+strGlobalColorSelector					= input.string 	(defval = "Allen",		title = "Color Selector",				group = globalGroupTimeframe,
+			  options					=				["Allen", "Ultr", "Mono"])
 			//   options					=				['Allen', 'Ultr', 'Inverse', 'Classic', 'Light', 'Mono'])
-float insGlobalTFCoefficient			= 				2.3
+float insGlobalTFCoefficient			= 				2
 
 /// ───────────────────────
 /// ─── Switch
 /// ───────────────────────
 
-[_co_gbl_buy, _co_gbl_sell, _co_gbl_long, _co_gbl_short, _co_gbl_neutral, _co_gbl_extra, _co_gbl_white, _co_gbl_black, _co_gbl_txt_light, _co_gbl_txt_dark]	= switch	strGlobalColorSelector
-	'Allen'								=> [#33FFAC,		#CCF8FF,		#ADEB42,		#EA1889,		#CCF8FF,		#FDF43C,		#E6F7FF,		#121F3D,		#FBFD73,		#121F3D]
-	'Ultr'								=> [#00E7FD,		#FE0CB6,		#00E7FD,		#FE0CB6,		#121F3D,		#FDF43C,		#E6F7FF,		#0C1633,		#E6F7FF,		#121F3D]
-	'Light'								=> [#2962FF,		#F23645,		#2962FF,		#F23645,		#FCFF8F,		#5C818A,		#E6F7FF,		#0C1633,		#E6F7FF,		#121F3D]
-	'Inverse'							=> [#ADEB42,		#EA1889,		#33FFAC,		#CCF8FF,		#CCF8FF,		#FDF43C,		#E6F7FF,		#0C1633,		#E6F7FF,		#121F3D]
-	'Classic'							=> [#B1FF05,		#D11C36,		#B1FF05,		#D11C36,		#5C818A,		#FCFF8F,		#E6F7FF,		#0C1633,		#E6F7FF,		#121F3D]
-	'Mono'								=> [#CCF8FF,		#0C1633,		#CCF8FF,		#0C1633,		#676B79,		#FCFF8F,		#E6F7FF,		#0C1633,		#E6F7FF,		#121F3D]
+[_co_gbl_buy,	_co_gbl_sell,	_co_gbl_long,	_co_gbl_short,	_co_gbl_neutral]										= switch	strGlobalColorSelector
+	"Allen"								=> [#33FFAC,		#CCF8FF,		#ADEB42,		#EA1889,		#CCF8FF]
+	"Ultr"								=> [#00E7FD,		#FE0CB6,		#00E7FD,		#FE0CB6,		#121F3D]
+	"Mono"								=> [#CCF8FF,		#0C1633,		#CCF8FF,		#0C1633,		#676B79]
+
+	// "Light"							=> [#2962FF,		#F23645,		#2962FF,		#F23645,		#FCFF8F]
+	// "Inverse"						=> [#ADEB42,		#EA1889,		#33FFAC,		#CCF8FF,		#CCF8FF]
+	// "Classic"						=> [#B1FF05,		#D11C36,		#B1FF05,		#D11C36,		#5C818A]
+
+/// ───────────────────────
+/// ─── Colors
+/// ───────────────────────
+
+_co_gbl_white							= #E6F7FF			//	CitiAccentUltraLightBlue			= #E6F7FF
+_co_gbl_pink							= #FFB7FF			//	WavBehPink20						= #FFB7FF
+_co_gbl_sky								= #0CF2F2			//	WavBehAqua50						= #0CF2F2
+_co_gbl_mint							= #4FFFC0			//	AllenMint50							= #4FFFC0
+_co_gbl_green							= #30d453			//	AllenGreen50						= #30d453
+_co_gbl_yellow							= #FDF43C			//	BrLiYel30							= #FDF43C
+_co_gbl_blue							= #0035FF			//	ARoPrimary							= #0035FF
+_co_gbl_black							= #0C1633			//	PlatziBlue80						= #0C1633
+_co_gbl_light							= #FBFD73			//	BrLiYel10							= #FBFD73
+_co_gbl_txt_dark						= #121F3D			//	PlatziBlue70						= #121F3D
 
 /// ───────────────────────
 /// ─── Types
@@ -154,12 +136,12 @@ FunGlobalPositionIn(_position) =>
 /// ─── function text size
 FunGlobalTextSize(_textsize) =>
 	switch _textsize
-		"Mini"							=> size.tiny
-		"Pequeño"						=> size.small
-		"Normal"						=> size.normal
-		"Grande"						=> size.large
-		"Enorme"						=> size.huge
-		"Auto"							=> size.auto
+		'Mini'							=> size.tiny
+		'Pequeño'						=> size.small
+		'Normal'						=> size.normal
+		'Grande'						=> size.large
+		'Enorme'						=> size.huge
+		'Auto'							=> size.auto
 
 /// ─── function line style
 FunGlobalLineStyle(_linestyle) =>
@@ -182,25 +164,25 @@ FunGlobalDayofWeek(_days) =>
 /// ─── function Timezone
 FunGlobalTimeZone(_timezone) =>
 	switch _timezone
-		"NYSE"							=> "UTC-5"
-		"New York"						=> "America/New_York"
-		"Chicago"						=> "America/Chicago"
-		"Londres"						=> "Europe/London"
-		"Tokyo"							=> "Asia/Tokyo"
-		"Shanghai"						=> "Asia/Shanghai"
-		"Sydney"						=> "Australia/Sydney"
-		"Argentina"						=> "America/Argentina/Buenos_Aires"
+		'NYSE'							=> 'UTC-5'
+		'New York'						=> 'America/New_York'
+		'Chicago'						=> 'America/Chicago'
+		'Londres'						=> 'Europe/London'
+		'Tokyo'							=> 'Asia/Tokyo'
+		'Shanghai'						=> 'Asia/Shanghai'
+		'Sydney'						=> 'Australia/Sydney'
+		'Argentina'						=> 'America/Argentina/Buenos_Aires'
 
 /// ─── function calculate MA
 FunGlobalCalculateMA(_source, _length, _type) =>
 	switch _type
-		"SMA"							=> ta.sma	(_source, _length)
-		"HMA"							=> ta.hma	(_source, _length)
-		"EMA"							=> ta.ema	(_source, _length)
-		"SMMA"							=> ta.rma	(_source, _length)
-		"WMA"							=> ta.wma	(_source, _length)
-		"VWMA"							=> ta.vwma	(_source, _length)
-		"MFI"							=> ta.mfi	(_source, _length)
+		'SMA'							=> ta.sma	(_source, _length)
+		'HMA'							=> ta.hma	(_source, _length)
+		'EMA'							=> ta.ema	(_source, _length)
+		'SMMA'							=> ta.rma	(_source, _length)
+		'WMA'							=> ta.wma	(_source, _length)
+		'VWMA'							=> ta.vwma	(_source, _length)
+		'MFI'							=> ta.mfi	(_source, _length)
 
 /// ─── Function create new table
 FunGlobalNewTable(_box, _col, _row, _width, _bgcolor, _txt, _txtcolor, _txthalign, _txtsize) =>
@@ -221,12 +203,11 @@ FunGlobalNewTable(_box, _col, _row, _width, _bgcolor, _txt, _txtcolor, _txthalig
 
 gblSource								= globalTypeOHL.new()
 
-//// ─────────────────────────────────────────────────────────────────────
-//// ─────────────────────────────────────────────────────────────────────
-//// ─────────────────────────────────────────────────────────────────────
+
+/// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 
 /// ╔═══════════════════════════════╗
-/// ║ 	Fx Market Sessions			║
+/// ║	Fx Market Sessions			║
 /// ╚═══════════════════════════════╝
 
 //// ─────────────────────────────────────────────────────────────────────
@@ -259,17 +240,17 @@ vFxMkSs_Extend							= 'Extendido'
 vfxMkSs_Hide							= 'Hide'
 tooltipFfxMkSs_TimeZ					= "Mas opciones de zonas horarias, por ej: 'GMT-4', 'GMT-3', 'GMT-2', 'GMT-1', \n 'GMT', 'GMT+1', 'GMT+2', 'GMT+3', 'GMT+4'"
 
-vFxMkSs_LondonColor						= WavBehAqua50
-vFxMkSs_NewYorkColor					= AllenMint60
-vFxMkSs_TokyoColor						= SurfePink500
-vFxMkSs_SydneyColor						= BrLiYel30
+vFxMkSs_LondonColor						= _co_gbl_sky
+vFxMkSs_NewYorkColor					= _co_gbl_mint
+vFxMkSs_TokyoColor						= _co_gbl_pink
+vFxMkSs_SydneyColor						= _co_gbl_yellow
 
-vFxMkSs_KillLonColor					= vFxMkSs_LondonColor
-vFxMkSs_KillNwYColor					= vFxMkSs_NewYorkColor
-vFxMkSs_KillTykColor					= vFxMkSs_TokyoColor
-vFxMkSs_KillSidColor					= vFxMkSs_SydneyColor
+vFxMkSs_KillLonColor					= _co_gbl_sky
+vFxMkSs_KillNwYColor					= _co_gbl_mint
+// vFxMkSs_KillTykColor					= _co_gbl_pink
+// vFxMkSs_KillSydColor					= _co_gbl_yellow
 
-vFxMkSs_NoneColor						= color.new(SurfePrimary, 100)
+vFxMkSs_NoneColor						= _co_gbl_black
 
 //// ───────────────────────
 /// ─── FxMSs ───
@@ -277,8 +258,8 @@ vFxMkSs_NoneColor						= color.new(SurfePrimary, 100)
 //// ───────────────────────
 
 /// ─── Timezone
-optFxMkSs_TimeZone						= input.string	(defval = 'NYSE',		title = 'Timezone',											group = fxMrkSsGroupGral,			tooltip = tooltipFfxMkSs_TimeZ ,
 // optFxMkSs_TimeZone						= input.string	(defval = 'New York',	title = 'Timezone',											group = fxMrkSsGroupGral,			tooltip = tooltipFfxMkSs_TimeZ ,
+optFxMkSs_TimeZone						= input.string	(defval = 'New York',	title = 'Timezone',											group = fxMrkSsGroupGral,			tooltip = tooltipFfxMkSs_TimeZ ,
 		  options						= 				['New York', 'Chicago', 'NYSE', 'Londres', 'Tokyo', 'Sydney', 'Argentina'])
 showFxMkSs_History						= input.string	(defval = vFxMkSs_Yes,	title = 'Historico',										group = fxMrkSsGroupGral,			options = [vFxMkSs_Yes, vFxMkSs_No]) == vFxMkSs_Yes
 vFxMkSs_Lookback						= 12 * 60
@@ -420,7 +401,7 @@ FunFxMkSs_RenderLabel(_show, _session, _is_started, _color, _top, _bottom, _text
 		if _is_started
 			my_label					:= label.new(time, v_position_y, array.join(v_label, vFxMkSs_IconSeparator),
 				  textcolor				= color.new(_color, vFxMkSs_LineOpacity),
-				  color					= vFxMkSs_NoneColor,
+				  color					= color.new(vFxMkSs_NoneColor, 100),
 				  size					= FunGlobalTextSize(optFxMkSs_LabelSize),
 				  style					= vFxMkSs_LabelPosition,
 				  xloc					= xloc.bar_time,
@@ -550,16 +531,16 @@ string ms_timeZone						= (FunGlobalTimeZone(optFxMkSs_TimeZone) == vFxMkSs_No o
 /// ─── Timeframe London
 int timeMkSs_SessLon					= time(timeframe.period, vFxMkSs_SessLnTimeZ, ms_timeZone)
 
-timeMkSs_KillLonOpen					= math.sign(nz(time(timeframe.period,	vFxMkSs_KillLonTimeOpen,	FunGlobalTimeZone(optFxMkSs_TimeZone))))
-timeMkSs_KillLonRally					= math.sign(nz(time(timeframe.period,	vFxMkSs_KillLonTimeRally,	FunGlobalTimeZone(optFxMkSs_TimeZone))))
-timeMkSs_KillLonClose					= math.sign(nz(time(timeframe.period,	vFxMkSs_KillLonTimeClose,	FunGlobalTimeZone(optFxMkSs_TimeZone))))
+timeMkSs_KillLonOpen					= time(timeframe.period,	vFxMkSs_KillLonTimeOpen,	FunGlobalTimeZone(optFxMkSs_TimeZone))
+timeMkSs_KillLonRally					= time(timeframe.period,	vFxMkSs_KillLonTimeRally,	FunGlobalTimeZone(optFxMkSs_TimeZone))
+timeMkSs_KillLonClose					= time(timeframe.period,	vFxMkSs_KillLonTimeClose,	FunGlobalTimeZone(optFxMkSs_TimeZone))
 
 /// ─── Timeframe New York
 int timeMkSs_SessNewY					= time(timeframe.period, vFxMkSs_SessNyTimeZ, ms_timeZone)
 
-timeMkSs_KillNwYOpen					= math.sign(nz(time(timeframe.period,	vFxMkSs_KillNwYTimeOpen,	FunGlobalTimeZone(optFxMkSs_TimeZone))))
-timeMkSs_KillNwYRally					= math.sign(nz(time(timeframe.period,	vFxMkSs_KillNwYTimeRally,	FunGlobalTimeZone(optFxMkSs_TimeZone))))
-timeMkSs_KillNwYClose					= math.sign(nz(time(timeframe.period,	vFxMkSs_KillNwYTimeClose,	FunGlobalTimeZone(optFxMkSs_TimeZone))))
+timeMkSs_KillNwYOpen					= time(timeframe.period,	vFxMkSs_KillNwYTimeOpen,	FunGlobalTimeZone(optFxMkSs_TimeZone))
+timeMkSs_KillNwYRally					= time(timeframe.period,	vFxMkSs_KillNwYTimeRally,	FunGlobalTimeZone(optFxMkSs_TimeZone))
+timeMkSs_KillNwYClose					= time(timeframe.period,	vFxMkSs_KillNwYTimeClose,	FunGlobalTimeZone(optFxMkSs_TimeZone))
 
 /// ─── Timeframe Tokyo
 int timeMkSs_SessTyk					= time(timeframe.period, vFxMkSs_SessTkTimeZ, ms_timeZone)
@@ -633,9 +614,119 @@ if showFxMkSs_KillNwYClose
 // 		FunSessionCellTimeClose					(3,	4,		'03:00')
 // 		FunSessionCellTimeKillzones				(4,	4,		'Killzones')
 
-//// ─────────────────────────────────────────────────────────────────────
-//// ─────────────────────────────────────────────────────────────────────
-//// ─────────────────────────────────────────────────────────────────────
+
+/// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+
+/// ╔═══════════════════════════════╗
+/// ║	ZeroLag Trend				║
+/// ╚═══════════════════════════════╝
+
+/// ───────────────────────
+/// ＩＮＰＵＴＳ
+/// ───────────────────────
+
+co_zeLag_up							= _co_gbl_green			//	#30d453
+co_zeLag_dn							= _co_gbl_short			//	#4043f1
+co_zeLag_signal						= _co_gbl_white
+co_zeLag_text						= _co_gbl_light
+co_zeLag_text_dark					= _co_gbl_txt_dark
+
+zeLag_GroupVar						= 'ZeroLag Trend'
+showZeLag_trend						= input.bool	(true,			title = 'Mostrar ZeroLag Trend',	group = zeLag_GroupVar,		inline = 'zerocheck')
+showZeLag_level_box					= input.bool	(true,			title = 'Mostrar box ZeroLag',		group = zeLag_GroupVar,		inline = 'zerocheck')
+zeLag_length						= input.int		(13,			title = 'Longitud',					group = zeLag_GroupVar)
+
+var bZeLag_BOX						= box(na)
+series float iZeLag_ATR				= ta.atr(200)
+
+/// ───────────────────────
+/// ＣＡＬＣＵＬＡＴＩＯＮＳ
+/// ───────────────────────
+
+series float iZeLag_EMA				= ta.ema(gblSource.C, zeLag_length)
+series float iZeLag_EMA50				= ta.ema(gblSource.C, 50)
+series float iZeLag_correction		= gblSource.C + (gblSource.C - iZeLag_EMA)									// factor zerolag
+series float iZeLag_ZLMA			= ta.ema(iZeLag_correction, zeLag_length)
+
+bool  zeLag_signal_buy				= ta.crossover(iZeLag_ZLMA, iZeLag_EMA)
+bool  zeLag_signal_sell				= ta.crossunder(iZeLag_ZLMA, iZeLag_EMA)
+
+// Determine the color of ZLMA based on its direction
+co_zeLag_ZLMA						= iZeLag_ZLMA	> iZeLag_ZLMA[3]	? co_zeLag_up	: iZeLag_ZLMA	< iZeLag_ZLMA[3]	? co_zeLag_dn	: na
+co_zeLag_EMA						= iZeLag_EMA	< iZeLag_ZLMA		? co_zeLag_up	: co_zeLag_dn			// ema color variant
+
+// Method to draw a box on the chart
+method FUN_zeLag_draw_box(color _color, top, _bottom, price) =>
+	box.new(
+			 bar_index, top, bar_index, _bottom, _color, 1, 
+			 bgcolor				= color.new(_color, 90), 
+			 text					= str.tostring(math.round(price, 2)), 
+			 text_size				= size.tiny,
+			 text_color				= chart.fg_color,
+			 text_halign			= text.align_right,
+			 force_overlay			= true
+			 )
+
+// Logic to draw trend levels as boxes on the chart
+if showZeLag_level_box and showZeLag_trend
+	bool _check_signals				= zeLag_signal_buy or zeLag_signal_sell // Check if there is an up or down signal
+
+	switch
+		// Draw a box when a bullish signal is detected
+		zeLag_signal_buy			=> bZeLag_BOX		:= co_zeLag_up.FUN_zeLag_draw_box(iZeLag_ZLMA, iZeLag_ZLMA - iZeLag_ATR, gblSource.C)
+
+		// Draw a box when a bearish signal is detected
+		zeLag_signal_sell			=> bZeLag_BOX		:= co_zeLag_dn.FUN_zeLag_draw_box(iZeLag_ZLMA + iZeLag_ATR, iZeLag_ZLMA, gblSource.C)
+
+	switch
+		// Extend the right side of the box if no new signal is detected
+		not zeLag_signal_buy or not zeLag_signal_sell => bZeLag_BOX.set_right(bar_index + 4)  
+		=> bZeLag_BOX := box(na) // Otherwise, reset the box
+
+/// ───────────────────────
+/// ＰＬＯＴ
+/// ───────────────────────
+
+// Plot the Zero-Lag Moving Average
+plot(showZeLag_trend ? iZeLag_EMA : na,						color = color.new(co_zeLag_EMA,		50),											linewidth = 3,		force_overlay		= true)
+plot(showZeLag_trend ? iZeLag_EMA50 : na,					color = color.new(co_zeLag_EMA,		50),											linewidth = 1,		force_overlay		= true)
+
+plot_zeLag_ZLMA						= plot(showZeLag_trend ? iZeLag_ZLMA : na,					color = color.new(co_zeLag_ZLMA, 25),			linewidth = 1,		force_overlay		= true)
+plot_zeLag_EMA						= plot(showZeLag_trend ? iZeLag_EMA : na,					color = color.new(co_zeLag_EMA, 25),			linewidth = 1,		force_overlay		= true)
+fill(plot_zeLag_ZLMA, plot_zeLag_EMA, iZeLag_ZLMA, iZeLag_EMA, 			color.new(co_zeLag_ZLMA, 80),					color.new(co_zeLag_EMA, 80))
+
+// Plot shapes for up and down signals
+plotshape(showZeLag_trend and zeLag_signal_buy ? iZeLag_ZLMA : na,
+		  title						= '',
+		  style						= shape.diamond,
+		  location					= location.absolute,
+		  color						= co_zeLag_up,
+		  size						= size.tiny,
+		  force_overlay				= true)
+
+plotshape(showZeLag_trend and zeLag_signal_sell ? iZeLag_ZLMA : na,
+		  title						= '',
+		  style						= shape.diamond,
+		  location					= location.absolute,
+		  color						= co_zeLag_dn,
+		  size						= size.tiny,
+		  force_overlay				= true)
+
+//	testing variables
+if barstate.islast and showZeLag_trend
+	label.delete(
+		 label.new(bar_index + 10, iZeLag_ZLMA, 
+		//  label.new(bar_index + 10, high, 
+		 'Compra: ' + str.tostring(iZeLag_ZLMA, format.mintick) + '\n' +
+		 'Venta: ' + str.tostring(iZeLag_EMA, format.mintick),
+		 color						= color.new(co_zeLag_signal, 50),
+		 style						= label.style_label_left, 
+		 textcolor					= co_zeLag_text_dark,
+		 force_overlay				= true
+		 )[1])
+
+
+/// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 
 /// ╔═══════════════════════════════╗
 /// ║ 	Market Structure Oscilador	║
@@ -648,82 +739,47 @@ if showFxMkSs_KillNwYClose
 /// ─── Variables ──
 //// ───────────────────────
 
-msOscilOSCColorBuy					= AllenMint60
-msOscilOSCColorSell					= AllenSky10
+co_msOscBuy							= _co_gbl_buy
+co_msOscSell						= _co_gbl_sell
+co_msOscLong						= _co_gbl_buy
+co_msOscShort						= _co_gbl_sell
 
-msOscilColorLong					= AllenMint60
-msOscilColorShort					= AllenSky10
-msOscilColorChUp					= AllenMint50
-msOscilColorChDn					= MongoSky10
-msOscilColorOsc						= BrLiYel30
-msOscilColorMid						= AllenMint10
+co_msOscRange						= _co_gbl_white
+msOscilColorOsc						= _co_gbl_white
+msOscilColorMid						= _co_gbl_white
 
 display								= display.all - display.status_line
 
 msOsc_VarsGroup						= 'Oscilador Market Structure'
-msWeightK1							= input.float	(defval = 1,							title = "  Escala Corta",					minval = 0,			group = msOsc_VarsGroup,	step=.1,		display = display)
-msWeightK2							= input.float	(defval = 3,							title = "  Escala Intermedia",				minval = 0,			group = msOsc_VarsGroup,	step=.1,		display = display)
-msWeightK3							= input.float	(defval = 2,							title = "  Escala Larga",					minval = 0,			group = msOsc_VarsGroup,	step=.1,		display = display)
-norm_Smooth							= input.int		(defval = 4,							title = '  Oscilador Suavizado',			minval = 1,			group = msOsc_VarsGroup,					display = display)
+msOsc_WeightK1						= input.float	(defval = 1,					title = '  Escala Corta',					minval = 0,			group = msOsc_VarsGroup,	step=.1,		display = display)
+msOsc_WeightK2						= input.float	(defval = 3,					title = '  Escala Intermedia',				minval = 0,			group = msOsc_VarsGroup,	step=.1,		display = display)
+msOsc_WeightK3						= input.float	(defval = 2,					title = '  Escala Larga',					minval = 0,			group = msOsc_VarsGroup,	step=.1,		display = display)
+msOsc_Norm_Smooth					= input.int		(defval = 4,					title = '  Oscilador Suavizado',			minval = 1,			group = msOsc_VarsGroup,					display = display)
 
 msOsc_Group							= 'Oscilador Gradiente'
-msOsc_Show							= input			(defval = true,							title = "Oscilador Cycle - Gradiente",							group = msOsc_Group)
-msBullColor							= input.color	(color.new(msOscilColorLong, 0),		title = 'Compra      ',											group = msOsc_Group,	inline = 'MS')
-msBearColor							= input.color	(color.new(msOscilColorShort, 0),		title = 'Venta',												group = msOsc_Group,	inline = 'MS')
-
-oscSig								= input			(defval = true,							title = "Oscilador Cycle - Gradiente (Confirmaciones)",			group = msOsc_Group)
-oBullColor							= input.color	(msOscilColorLong,						title = 'Compra      ',											group = msOsc_Group,	inline = 'SYG')
-oBearColor							= input.color	(msOscilColorShort,						title = 'Venta',												group = msOsc_Group,	inline = 'SYG')
+msOsc_Show							= input			(defval = true,					title = 'Oscilador Cycle - Gradiente',							group = msOsc_Group)
 
 cyc_Group							= 'Oscilador Cycle'
-cycleOpt							= input			(defval = false,						title = "Oscilador Cycle - Histograma",							group = cyc_Group)
-cyc_Smooth							= input.int		(defval = 7,							title = '  Cycle Marca Longitud',			minval = 1,			group = cyc_Group,						display = display)
-cBullColor							= input.color	(color.new(msOscilColorLong, 20),		title = 'Compra      ',											group = cyc_Group,		inline = 'CYC')
-cBearColor							= input.color	(color.new(msOscilColorShort, 20),		title = 'Venta',												group = cyc_Group,		inline = 'CYC')
-
-cycleSig							= input			(defval = false,						title = "Oscilador Cycle - Histograma (Confirmaciones)",		group = cyc_Group)
-sBullColor							= input.color	(color.new(msOscilColorLong, 0),		title = 'Compra      ',											group = cyc_Group,		inline = 'SIG')
-sBearColor							= input.color	(color.new(msOscilColorShort, 0),		title = 'Venta',												group = cyc_Group,		inline = 'SIG')
-
-// cycMix_Group							= 'Oscilador Dual'
-// msOsCycleSig							= input			(defval = true,							title = "Dual Cycle - Gradie & Histo (Confirmaciones)",			group = cycMix_Group)
-// msMarcaV1							= input			(defval = 50,							title = " Dual Venta ",											group = cycMix_Group,	inline = 'mM1w')
-// msMarcaV2							= input			(defval = 50,							title = " & ",													group = cycMix_Group,	inline = 'mM1w')
-
-// msMarcaC1							= input			(defval = 50,							title = " Dual Compra",											group = cycMix_Group,	inline = 'mM2w')
-// msMarcaC2							= input			(defval = 50,							title = " & ",													group = cycMix_Group,	inline = 'mM2w')
-
-// sMixBullColor						= input.color	(color.new(msOscilColorLong, 0),		title = 'Compra      ',											group = cycMix_Group,	inline = 'SIM')
-// sMixBearColor						= input.color	(color.new(msOscilColorShort, 0),		title = 'Venta',												group = cycMix_Group,	inline = 'SIM')
+cycleOpt							= input			(defval = false,				title = 'Oscilador Cycle - Histograma',							group = cyc_Group)
+cyc_Smooth							= input.int		(defval = 7,					title = '  Cycle Marca Longitud',			minval = 1,			group = cyc_Group,						display = display)
 
 genericGroup						= 'Market Structure en Gráfico'
-msOnChart1							= input			(defval = true,							title = "Estructura de rango Corto",							group = genericGroup)
-msOnChartK1							= input.string	(defval = '····',						title = '  Linea',		options = ['⎯⎯⎯⎯', '----', '····'],		group = genericGroup,	inline = 'K1',	display = display)
-stMSLblK1T							= input.string	(defval = 'Disabled',					title = 'Tags',			options = ['Enabled', 'Disabled'],		group = genericGroup,	inline = 'K1',	display = display),	stMSLblK1 = stMSLblK1T == 'Enabled'
-cBullColorK1						= input.color	(color.new(msOscilColorChUp, 35),		title = 'Compra      ', 										group = genericGroup,	inline = 'K1c')
-cBearColorK1						= input.color	(color.new(msOscilColorChDn, 35),		title = 'Venta',												group = genericGroup,	inline = 'K1c')
+msOnChart1							= input			(defval = true,					title = 'Estructura de rango Corto',							group = genericGroup)
+msOnChartK1							= input.string	(defval = '····',				title = '  Linea',		options = ['⎯⎯⎯⎯', '----', '····'],		group = genericGroup,	inline = 'K1',	display = display)
+stMSLblK1T							= input.string	(defval = 'Disabled',			title = 'Tags',			options = ['Enabled', 'Disabled'],		group = genericGroup,	inline = 'K1',	display = display),	stMSLblK1 = stMSLblK1T == 'Enabled'
 
-msOnChart2							= input			(defval = true,							title = "Estructura de rango Intermedio",						group = genericGroup)
-msOnChartK2							= input.string	(defval = '----',						title = '  Linea',		options = ['⎯⎯⎯⎯', '----', '····'],		group = genericGroup,	inline = 'K2',	display = display)
-stMSLblK2T							= input.string	(defval = 'Disabled',					title = 'Tags',			options = ['Enabled', 'Disabled'],		group = genericGroup,	inline = 'K2',	display = display),	stMSLblK2 = stMSLblK2T == 'Enabled'
-cBullColorK2						= input.color	(color.new(msOscilColorChUp, 35),		title = 'Compra      ',											group = genericGroup,	inline = 'K2c')
-cBearColorK2						= input.color	(color.new(msOscilColorChDn, 35),		title = 'Venta',												group = genericGroup,	inline = 'K2c')
+msOnChart2							= input			(defval = true,					title = 'Estructura de rango Intermedio',						group = genericGroup)
+msOnChartK2							= input.string	(defval = '----',				title = '  Linea',		options = ['⎯⎯⎯⎯', '----', '····'],		group = genericGroup,	inline = 'K2',	display = display)
+stMSLblK2T							= input.string	(defval = 'Disabled',			title = 'Tags',			options = ['Enabled', 'Disabled'],		group = genericGroup,	inline = 'K2',	display = display),	stMSLblK2 = stMSLblK2T == 'Enabled'
 
-msOnChart3							= input			(defval = true,							title = "Estructura de rango Largo", 							group = genericGroup)
-msOnChartK3							= input.string	(defval = '⎯⎯⎯⎯',						title = '  Linea',		options = ['⎯⎯⎯⎯', '----', '····'],		group = genericGroup,	inline = 'K3',	display = display)
-stMSLblK3T							= input.string	(defval = 'Enabled',					title = 'Tags',			options = ['Enabled', 'Disabled'],		group = genericGroup,	inline = 'K3',	display = display),	stMSLblK3 = stMSLblK3T == 'Enabled'
-cBullColorK3						= input.color	(color.new(msOscilColorChUp, 35),		title = 'Compra      ',											group = genericGroup,	inline = 'K3c')
-cBearColorK3						= input.color	(color.new(msOscilColorChDn, 35),		title = 'Venta',												group = genericGroup,	inline = 'K3c')
+msOnChart3							= input			(defval = true,					title = 'Estructura de rango Largo', 							group = genericGroup)
+msOnChartK3							= input.string	(defval = '⎯⎯⎯⎯',				title = '  Linea',		options = ['⎯⎯⎯⎯', '----', '····'],		group = genericGroup,	inline = 'K3',	display = display)
+stMSLblK3T							= input.string	(defval = 'Enabled',			title = 'Tags',			options = ['Enabled', 'Disabled'],		group = genericGroup,	inline = 'K3',	display = display),	stMSLblK3 = stMSLblK3T == 'Enabled'
 
 msOscCG								= 'Rango de Oscilador'
-msDataK1							= input			(false,									title = "Oscilador de rango Corto",								group = msOscCG,		inline = 'k1w')
-msColorK1							= input			(color.new(msOscilColorOsc, 40),		title = "",														group = msOscCG,		inline = 'k1w')
-
-msDataK2							= input			(false,									title = "Oscilador de rango Medio",								group = msOscCG,		inline = 'k2w')
-msColorK2							= input			(color.new(msOscilColorOsc, 40),		title = "",														group = msOscCG,		inline = 'k2w')
-
-msDataK3							= input			(false,									title = "Oscilador de rango Largo",								group = msOscCG,		inline = 'k3w')
-msColorK3							= input			(color.new(msOscilColorOsc, 40),		title = "",														group = msOscCG,		inline = 'k3w')
+show_msOscRange1					= input			(false,							title = 'Oscilador de rango Corto',								group = msOscCG,		inline = 'k1w')
+show_msOscRange2					= input			(false,							title = 'Oscilador de rango Medio',								group = msOscCG,		inline = 'k2w')
+show_msOscRange3					= input			(false,							title = 'Oscilador de rango Largo',								group = msOscCG,		inline = 'k3w')
 
 msOscSizeBosChoch					= size.tiny
 
@@ -820,7 +876,7 @@ Fun_msOsc_shortMarketStructure() =>
 		stLow.isCrossed				:= true
 		_bear						:= true
 
-	Fun_msOsc_normalize(_bull, _bear, norm_Smooth)
+	Fun_msOsc_normalize(_bull, _bear, msOsc_Norm_Smooth)
 
 Fun_msOsc_marketStructure(SWINGS hSwingHigh, SWINGS hSwingLow, SWINGS lSwingHigh, SWINGS lSwingLow) => 
 
@@ -847,7 +903,7 @@ Fun_msOsc_marketStructure(SWINGS hSwingHigh, SWINGS hSwingLow, SWINGS lSwingHigh
 		hSwingLow.isCrossed			:= true
 		_bear						:= true
 
-	Fun_msOsc_normalize(_bull, _bear, norm_Smooth)
+	Fun_msOsc_normalize(_bull, _bear, msOsc_Norm_Smooth)
 
 Fun_msOsc_collectData() => [Fun_msOsc_shortMarketStructure(), Fun_msOsc_marketStructure(itHigh, itLow, stHigh, stLow), Fun_msOsc_marketStructure(ltHigh, ltLow, itHigh, itLow)]
 
@@ -856,13 +912,13 @@ Fun_msOsc_collectData() => [Fun_msOsc_shortMarketStructure(), Fun_msOsc_marketSt
 /// ─── Maths ──
 //// ───────────────────────
 
-log.info("yaz_kizim {0} {1}", ltHigh.lastPrice, ltHigh.isCrossed)
+log.info('yaz_kizim {0} {1}', ltHigh.lastPrice, ltHigh.isCrossed)
 
 if msOnChart1
 	if gblSource.C > stHigh.lastPrice and not stHigh.isCrossed
 
 		line.new(stHigh.lastIndex, stHigh.lastPrice, gblSource.I, stHigh.lastPrice,
-					  color				= cBullColorK1,
+					  color				= color.new(co_msOscLong, 35),
 					  style				= FunGlobalLineStyle(msOnChartK1),
 					  width				= 1,
 					  force_overlay		= true)
@@ -871,7 +927,7 @@ if msOnChart1
 			box.new(stHigh.lastIndex, stHigh.lastPrice, gblSource.I, stHigh.lastPrice,
 					  border_color		= color(na),
 					  text				= stMS.type < 0 ? 'CHoCH' : 'BoS',
-					  text_color		= cBullColorK1,
+					  text_color		= color.new(co_msOscLong, 35),
 					  text_size			= msOscSizeBosChoch,
 					  text_halign		= text.align_left,
 					  text_valign		= text.align_bottom,
@@ -882,7 +938,7 @@ if msOnChart1
 	if gblSource.C < stLow.lastPrice and not stLow.isCrossed
 
 		line.new(stLow.lastIndex, stLow.lastPrice, gblSource.I, stLow.lastPrice,
-					  color				= cBearColorK1,
+					  color				= color.new(co_msOscShort, 35),
 					  style				= FunGlobalLineStyle(msOnChartK1),
 					  width				= 1,
 					  force_overlay		= true)
@@ -891,7 +947,7 @@ if msOnChart1
 			box.new(stLow.lastIndex, stLow.lastPrice, gblSource.I, stLow.lastPrice,
 					  border_color		= color(na),
 					  text				= stMS.type > 0 ? 'CHoCH' : 'BoS',
-					  text_color		= cBearColorK1,
+					  text_color		= color.new(co_msOscShort, 35),
 					  text_size			= msOscSizeBosChoch,
 					  text_halign		= text.align_left,
 					  text_valign		= text.align_top,
@@ -903,7 +959,7 @@ if msOnChart2
 	if gblSource.C > itHigh.lastPrice and not itHigh.isCrossed
 
 		line.new(itHigh.lastIndex, itHigh.lastPrice, gblSource.I, itHigh.lastPrice,
-					  color				= cBullColorK2,
+					  color				= color.new(co_msOscLong, 35),
 					  style				= FunGlobalLineStyle(msOnChartK2),
 					  width				= 1,
 					  force_overlay		= true)
@@ -911,7 +967,7 @@ if msOnChart2
 			box.new(itHigh.lastIndex, itHigh.lastPrice, gblSource.I, itHigh.lastPrice,
 					  border_color		= color(na),
 					  text				= itMS.type < 0 ? 'CHoCH' : 'BoS',
-					  text_color		= cBullColorK2,
+					  text_color		= color.new(co_msOscLong, 35),
 					  text_size			= msOscSizeBosChoch,
 					  text_halign		= text.align_left,
 					  text_valign		= text.align_bottom,
@@ -922,7 +978,7 @@ if msOnChart2
 	if gblSource.C < itLow.lastPrice and not itLow.isCrossed
 
 		line.new(itLow.lastIndex, itLow.lastPrice, gblSource.I, itLow.lastPrice,
-					  color				= cBearColorK2,
+					  color				= color.new(co_msOscShort, 35),
 					  style				= FunGlobalLineStyle(msOnChartK2),
 					  width				= 1,
 					  force_overlay		= true)
@@ -930,7 +986,7 @@ if msOnChart2
 			box.new(itLow.lastIndex, itLow.lastPrice, gblSource.I, itLow.lastPrice,
 					  border_color		= color(na),
 					  text				= itMS.type > 0 ? 'CHoCH' : 'BoS',
-					  text_color		= cBearColorK2,
+					  text_color		= color.new(co_msOscShort, 35),
 					  text_size			= msOscSizeBosChoch,
 					  text_halign		= text.align_left,
 					  text_valign		= text.align_top,
@@ -942,7 +998,7 @@ if msOnChart3
 	if gblSource.C > ltHigh.lastPrice and not ltHigh.isCrossed
 
 		line.new(ltHigh.lastIndex, ltHigh.lastPrice, gblSource.I, ltHigh.lastPrice,
-					  color				= cBullColorK3,
+					  color				= color.new(co_msOscLong, 35),
 					  style				= FunGlobalLineStyle(msOnChartK3),
 					  width				= 1,
 					  force_overlay		= true)
@@ -951,7 +1007,7 @@ if msOnChart3
 			box.new(ltHigh.lastIndex, ltHigh.lastPrice, gblSource.I, ltHigh.lastPrice,
 					  border_color		= color(na),
 					  text				= ltMS.type < 0 ? 'CHoCH' : 'BoS',
-					  text_color		= cBullColorK3,
+					  text_color		= color.new(co_msOscLong, 35),
 					  text_size			= msOscSizeBosChoch,
 					  text_halign		= text.align_left,
 					  text_valign		= text.align_bottom,
@@ -962,7 +1018,7 @@ if msOnChart3
 	if gblSource.C < ltLow.lastPrice and not ltLow.isCrossed
 
 		line.new(ltLow.lastIndex, ltLow.lastPrice, gblSource.I, ltLow.lastPrice,
-					  color				= cBearColorK3,
+					  color				= color.new(co_msOscShort, 35),
 					  style				= FunGlobalLineStyle(msOnChartK3),
 					  width				= 1,
 					  force_overlay		= true)
@@ -971,7 +1027,7 @@ if msOnChart3
 			box.new(ltLow.lastIndex, ltLow.lastPrice, gblSource.I, ltLow.lastPrice,
 					  border_color		= color(na),
 					  text				= ltMS.type > 0 ? 'CHoCH' : 'BoS',
-					  text_color		= cBearColorK3,
+					  text_color		= color.new(co_msOscShort, 35),
 					  text_size			= msOscSizeBosChoch,
 					  text_halign		= text.align_left,
 					  text_valign		= text.align_top,
@@ -985,58 +1041,56 @@ if msOnChart3
 //// ───────────────────────
 
 /// ─── Lineal
-midLine				= plot(msOsc_Show or msDataK1 or msDataK2 or msDataK3 ? 50 : na,	'Equilibrio',		color.new(msOscilColorMid, 50),	display = display,		editable = false)
+midLine				= plot(msOsc_Show or show_msOscRange1 or show_msOscRange2 or show_msOscRange3 ? 50 : na,	'Equilibrio',		color.new(msOscilColorMid, 50),	display = display,		editable = false)
 
 [stValue1, stValue2, stValue3] = Fun_msOsc_collectData()
 
 /// ─── Oscilador
-msOSC				= (msWeightK1 * nz(stValue1, 0) + msWeightK2 * nz(stValue2, 0) + msWeightK3 * nz(stValue3, 0)) / (msWeightK1 * (na(stValue1) ? 0 : 1) + msWeightK2 * (na(stValue2) ? 0 : 1) + msWeightK3 * (na(stValue3) ? 0 : 1))
-msPlot				= plot(msOsc_Show ? msOSC : na,		'Oscilador Market Structure',			color.from_gradient(msOSC, 0, 100, msBearColor, msBullColor), 1,	display = display)
+msOSC				= (msOsc_WeightK1 * nz(stValue1, 0) + msOsc_WeightK2 * nz(stValue2, 0) + msOsc_WeightK3 * nz(stValue3, 0)) / (msOsc_WeightK1 * (na(stValue1) ? 0 : 1) + msOsc_WeightK2 * (na(stValue2) ? 0 : 1) + msOsc_WeightK3 * (na(stValue3) ? 0 : 1))
+msPlot				= plot(msOsc_Show ? msOSC : na,				'Oscilador Market Structure',			color.from_gradient(msOSC, 0, 100, color.new(co_msOscSell, 0), color.new(co_msOscBuy, 0)), 1,	display = display)
 
 /// ─── Histogram Cycle
-plot				(msDataK1 ? stValue1 : na,			'Oscilador de rango corto',				msColorK1,	1,	display = display)
-plot				(msDataK2 ? stValue2 : na,			'oscilador de rango Intermedio',		msColorK2,	1,	display = display)
-plot				(msDataK3 ? stValue3 : na,			'Oscilador de rango Largo',				msColorK3,	1,	display = display)
+plot				(show_msOscRange1 ? stValue1 : na,			'Oscilador de rango corto',				color.new(co_msOscRange, 40),	1,	display = display)
+plot				(show_msOscRange2 ? stValue2 : na,			'oscilador de rango Intermedio',		color.new(co_msOscRange, 40),	1,	display = display)
+plot				(show_msOscRange3 ? stValue3 : na,			'Oscilador de rango Largo',				color.new(co_msOscRange, 40),	1,	display = display)
 
 cycleFast			= cycleOpt ? msOSC - ta.ema(msOSC, cyc_Smooth) + 50 : 50
-plotcandle			(50., 50., 50., cycleFast,			'Histograma Cycle',						cycleFast > 50 ? cBullColor : cBearColor,	display = display,	bordercolor = cycleOpt ? cycleFast > 50 ? cBullColor : cBearColor : color.gray)
+plotcandle			(50., 50., 50., cycleFast,					'Histograma Cycle',						cycleFast > 50 ? color.new(co_msOscBuy, 20) : color.new(co_msOscSell, 20),	display = display,	bordercolor = cycleOpt ? cycleFast > 50 ? color.new(co_msOscBuy, 20) : color.new(co_msOscSell, 20) : color.gray)
 
-fill				(msPlot, midLine, 100, cycleOpt ? 60 : 50, top_color = color.new(msBullColor,   0), bottom_color = color.new(msBullColor, 100), title = "Bullish Gradient Fill")
-fill				(msPlot, midLine,  cycleOpt ? 40 : 50,  0, top_color = color.new(msBearColor, 100), bottom_color = color.new(msBearColor,   0), title = "Bearish Gradient Fill")
+fill				(msPlot, midLine, 100, cycleOpt ? 60 : 50, top_color = color.new(co_msOscBuy,   0), bottom_color = color.new(co_msOscBuy, 100), title = 'Bullish Gradient Fill')
+fill				(msPlot, midLine,  cycleOpt ? 40 : 50,  0, top_color = color.new(co_msOscSell, 100), bottom_color = color.new(co_msOscSell,   0), title = 'Bearish Gradient Fill')
 
-//// ─────────────────────────────────────────────────────────────────────
-//// ─────────────────────────────────────────────────────────────────────
-//// ─────────────────────────────────────────────────────────────────────
+
+/// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 
 /// ╔═══════════════════════════════╗
-/// ║ 	RSI Supertrend				║
-/// ║ 	@	Allen	㔬				║
+/// ║	RSI Supertrend				║
+/// ║	@	Allen	㔬				║
 /// ╚═══════════════════════════════╝
 
 //// ─────────────────────────────────────────────────────────────────────
 
-co_sTrend_Up					= AllenMint60
-co_sTrend_Down					= AllenSky10
-co_sTrend_RSI					= AmeTrBlueFrost
-co_sTrend_Dark					= PlatziBlue70
-// co_sTrend_Dark					= _co_gbl_black
+co_sTrend_Up					= _co_gbl_buy
+co_sTrend_Down					= _co_gbl_sell
+co_sTrend_RSI					= _co_gbl_white			// AmeTrBlueFrost
+co_sTrend_Dark					= _co_gbl_black			// PlatziBlue70
 
 //// ───────────────────────
 /// ─── Supertrend Rsi
 /// ─── Variables ────
 //// ───────────────────────
 
-show_sTrendSTrend				= input.bool	(defval = true,			title = "Visualizar Supertrend",	group = "RSI Settings")
+show_sTrendSTrend				= input.bool	(defval = true,			title = 'Visualizar Supertrend',	group = 'RSI Settings')
 
-sTrendRSILength					= input.int		(defval = 14,			title = "Longitud RSI",				group = "RSI Settings")
-sTrendSmoothLength				= input.int		(defval = 21,			title = "Longitud RSI Suavisado",	group = "RSI Settings")
-show_sTrendISmoothed			= input.bool	(defval = false,		title = "Suavisado RSI",			group = "RSI Settings")
+sTrendRSILength					= input.int		(defval = 14,			title = 'Longitud RSI',				group = 'RSI Settings')
+sTrendSmoothLength				= input.int		(defval = 21,			title = 'Longitud RSI Suavisado',	group = 'RSI Settings')
+show_sTrendISmoothed			= input.bool	(defval = false,		title = 'Suavisado RSI',			group = 'RSI Settings')
 
-sTrendMALength					= input.int		(defval = 14,			title = "Longitud MA",				group = "MA Settings",			display = display.data_window)
-sTrendMAType					= input.string	(defval = "HMA",		title = "Tipo MA",					group = "MA Settings",			options = ["SMA", "HMA", "EMA", "SMMA", "WMA", "VWMA"],	display = display.data_window)
+sTrendMALength					= input.int		(defval = 14,			title = 'Longitud MA',				group = 'MA Settings',			display = display.data_window)
+sTrendMAType					= input.string	(defval = 'HMA',		title = 'Tipo MA',					group = 'MA Settings',			options = ['SMA', 'HMA', 'EMA', 'SMMA', 'WMA', 'VWMA'],	display = display.data_window)
 
-sTrendFactor					= input.float	(defval = 0.8,			title = "Factor",					group = "Super Trend Settings")
-sTrendATRLength					= input.int		(defval = 10,			title = "Longitud ATR",				group = "Super Trend Settings")
+sTrendFactor					= input.float	(defval = 0.8,			title = 'Factor',					group = 'Super Trend Settings')
+sTrendATRLength					= input.int		(defval = 10,			title = 'Longitud ATR',				group = 'Super Trend Settings')
 
 //// ───────────────────────
 /// ─── Supertrend Rsi
@@ -1090,21 +1144,20 @@ sTrend_RsiValue							= show_sTrendISmoothed and show_sTrendSTrend ? ta.hma(ta.r
 //// ───────────────────────
 
 /// ─── Plot RSI / MA
-plot_sTrend_Strend						= plot(sTrendRsiSupertrend,		color = FusTTrendDirection == -1 ? co_sTrend_Up : co_sTrend_Down,						title = "Supertrend")
-plot_sTrend_Rsi							= plot(sTrend_RsiValue,			color = FusTTrendDirection == -1 ? co_sTrend_Up : co_sTrend_Down,		linewidth = 1,	title = "")
+plot_sTrend_Strend						= plot(sTrendRsiSupertrend,		color = FusTTrendDirection == -1 ? co_sTrend_Up : co_sTrend_Down,							title = 'Supertrend')
+plot_sTrend_Rsi							= plot(sTrend_RsiValue,			color = FusTTrendDirection == -1 ? co_sTrend_Up : co_sTrend_Down,			linewidth = 1,	title = '')
 
 /// ─── Lines OverBought / OverSold
 plot(110,			color = color.from_gradient(sTrend_RsiValue,	60,	80,	color.new(co_sTrend_Dark, 70),		color.new(co_sTrend_Down, 0)),		linewidth = 6)
-plot(-10,			color = color.from_gradient(sTrend_RsiValue,	20,	40,	color.new(co_sTrend_Up, 0),		color.new(co_sTrend_Dark, 70)),	linewidth = 6)
+plot(-10,			color = color.from_gradient(sTrend_RsiValue,	20,	40,	color.new(co_sTrend_Up, 0),			color.new(co_sTrend_Dark, 70)),		linewidth = 6)
 
 /// ─── Filling ───────
-fill(plot_sTrend_Strend, plot_sTrend_Rsi,									color = FusTTrendDirection == 1 ? color.new(co_sTrend_Down, 90) : color.new(co_sTrend_Up, 90),	title = "Zona de Tendencia")
+fill(plot_sTrend_Strend, plot_sTrend_Rsi,									color = FusTTrendDirection == 1 ? color.new(co_sTrend_Down, 90) : color.new(co_sTrend_Up, 90),	title = 'Zona de Tendencia')
 fill(plot_sTrend_Strend, plot_sTrend_Rsi, sTrend_RsiValue, sTrendRsiSupertrend, color.new(chart.bg_color, 1000),		FusTTrendDirection == 1 ? co_sTrend_Down : co_sTrend_Up)
 
 // /// ─── Crossover & CrossUnder Signal
-// plotshape(ta.crossover(sTrendRsiSupertrend, sTrend_RsiValue)		and sTrendRsiSupertrend > 70 ? 85 : na,	style = shape.triangledown,	location = location.absolute,	color = co_sTrend_Down,	size = size.tiny,	title = "▼")
-// plotshape(ta.crossunder(sTrendRsiSupertrend, sTrend_RsiValue)	and sTrendRsiSupertrend < 30 ? 15 : na,	style = shape.triangleup,	location = location.absolute,	color = co_sTrend_Up,		size = size.tiny,	title = "▲")
+// plotshape(ta.crossover(sTrendRsiSupertrend, sTrend_RsiValue)		and sTrendRsiSupertrend > 70 ? 85 : na,	style = shape.triangledown,	location = location.absolute,	color = co_sTrend_Down,	size = size.tiny,	title = '▼')
+// plotshape(ta.crossunder(sTrendRsiSupertrend, sTrend_RsiValue)	and sTrendRsiSupertrend < 30 ? 15 : na,	style = shape.triangleup,	location = location.absolute,	color = co_sTrend_Up,		size = size.tiny,	title = '▲')
 
-//// ─────────────────────────────────────────────────────────────────────
-//// ─────────────────────────────────────────────────────────────────────
-//// ─────────────────────────────────────────────────────────────────────
+
+/// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■

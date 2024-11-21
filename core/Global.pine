@@ -209,6 +209,86 @@ FunGlobalTimeZone(_timezone) =>
 		"Sydney"						=> "Australia/Sydney"
 		"Argentina"						=> "America/Argentina/Buenos_Aires"
 
+/// ─── function tsi
+FunGlobalCalculateTSI(bool _fast, _source) =>
+// FunGlobalCalculateTSI(bool _speed, _source, _fast_long, _fast_short, _fast_signal, _slow_long, _slow_short, _slow_signal) =>
+	if _fast
+		_long				= 25
+		_short				= 5
+		_signal				= 14
+
+	else
+		_long				= 25
+		_short				= 13
+		_signal				= 13
+
+	_tsi					= ta.tsi(_source, _short, _long) * 100
+	_tsi_ema				= ta.ema(_tsi, _signal)
+
+	[_tsi, _tsi_ema]
+
+/// ─── function hvar
+FunGlobalCalcHLVar(_source, _length) =>
+	_alpha								= 2 / (_length + 1)
+	_vud								= _source	> _source[1]	? _source		- _source[1]	: 0
+	_vdd								= _source	< _source[1]	? _source[1]	- _source		: 0
+	_v_upD								= math.sum(_vud, 9)
+	_v_downD							= math.sum(_vdd, 9)
+	_v_CMO								= nz((_v_upD - _v_downD) / (_v_upD + _v_downD))
+	_HLVAR								= 0.0
+	_HLVAR								:= nz(_alpha * math.abs(_v_CMO) * _source) + (1 - _alpha * math.abs(_v_CMO)) * nz(HLVAR[1])
+	_HLVAR
+
+/// ─── function kama
+FunGlobalCalcKama(_source, _length) =>
+
+	_KAMA								= 0.0
+	_xvnoise							= math.abs(_source - _source[1])
+	_fastend							= 0.666
+	_slowend							= 0.0645
+	_signal								= math.abs(_source - _source[_length])
+	_noise								= math.sum(_xvnoise, _length)
+	_nefratio							= _noise != 0 ? _signal / _noise : 0
+	_smooth								= math.pow(_nefratio * (_fastend - _slowend) + _slowend, 2)
+	_KAMA								:= nz(_KAMA[1])		+ _smooth * (_source - nz(_KAMA[1]))
+	_KAMA
+
+/// ─── function trama
+FunGlobalCalcTRAMA(_source, _length) =>
+	_ama								= 0.
+	_hhA								= math.max(math.sign(ta.change(ta.highest(_length))), 0)
+	_llA								= bool(math.max(math.sign(ta.change(ta.lowest(_length)) * -1), 0))
+	_tc									= math.pow(ta.sma(bool(_hhA) or bool(_llA) ? 1 : 0, _length), 2)
+	_ama								:= nz(_ama[1] + _tc * (_source - _ama[1]), _source)
+	_ama
+
+/// ─── function dema
+FunGlobalCalcDEMA(_source, _length) =>
+	_hldema								= 0.0
+	_hldema								:= 2 * ta.ema(_source, _length) - ta.ema(ta.ema(_source, _length), _length)
+	_hldema
+
+/// ─── function zlema
+FunGlobalCalcHLZlema(_source, _length) =>
+	_zxLag								= _length / 2 == math.round(_length / 2) ? _length / 2 : (_length - 1) / 2
+	_zxEMAData							= _source + _source - _source[_zxLag]
+	_hlzlema							= ta.ema(_zxEMAData, _length)
+	_hlzlema
+
+/// ─── function tsf
+FunGlobalCalcHLTsf(_source, _length) =>
+	_linreg								= ta.linreg(_source, _length, 0)
+	_linregV							= ta.linreg(_source, _length, 1)
+	_lrs_minus							= _linreg - _linregV
+	_hltsf								= ta.linreg(_source, _length, 0) + _lrs_minus
+	_hltsf
+
+/// ─── function wwma
+FunGlobalCalcHLWwma(_source, _length) =>
+	_wwalpha							= 1 / _length
+	_hlwwma								= 0.0
+	_hlwwma								:= _wwalpha * _source + (1 - _wwalpha) * nz(_hlwwma[1])
+	_hlwwma
 
 /// ─── function calculate MA
 FunGlobalCalculateMA(_source, _length, _type) =>
@@ -220,6 +300,17 @@ FunGlobalCalculateMA(_source, _length, _type) =>
 		"WMA"							=> ta.wma	(_source, _length)
 		"VWMA"							=> ta.vwma	(_source, _length)
 		"MFI"							=> ta.mfi	(_source, _length)
+
+		// "TSI"							=> = ta.tsi(_source, _short, _long) * 100
+		"LSMA"							=> ta.linreg(_source, _length, offset = 0)
+
+		"KAMA"							=> FunGlobalCalcKama		(_source, _length)
+		"TRAMA"							=> FunGlobalCalcTRAMA		(_source, _length)
+		"VAR"							=> FunGlobalCalcHLVar		(_source, _length)
+		"DEMA"							=> FunGlobalCalcDEMA		(_source, _length)
+		"ZLEMA"							=> FunGlobalCalcHLZlema		(_source, _length)
+		"TSF"							=> FunGlobalCalcHLTsf		(_source, _length)
+		"WWMA"							=> FunGlobalCalcHLWwma		(_source, _length)
 
 /// ─── function calculate ATR
 FusGlobalCalculateATR(_source, _atr_length) =>
@@ -351,3 +442,4 @@ globalOHL								= globalTypeOHL.new()
 //// ─────────────────────────────────────────────────────────────────────
 
 /// ─── 🔘🔴🟢🟡🛑⚙️🎲🧿🎯🎱🤖💀☠️👻👽👾😈🥶😰😶‍🌫️🩻💰⏱️⏰⏲️🧭☃️⚪⚫🔘
+/// ───  ■ × ◙
