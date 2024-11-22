@@ -4,30 +4,32 @@
 /// ╔═══════════════════════════════╗
 /// ║	Fx Market Sessions			║
 /// ╔═══════════════════════════════╗
-/// ║	Market Structure Oscilador	║
+/// ║	Market Structure Oscillador	║
 /// ╔═══════════════════════════════╗
 /// ║	RSI Supertrend				║
 /// ╔═══════════════════════════════╗
 /// ║	ZeroLag Trend				║
+/// ╔═══════════════════════════════╗
+/// ║	Aroon Oscillator			║
 /// ║	@	Allen	㔬				║
 /// ╚═══════════════════════════════╝
 
 //@version=5
-indicator(title							= 'FxMarketSessions & MarketStructureOscilador & Rsi Supertrend & ZeroLag & Aroon & Vidya & TSI Diverg & xPanels [🎱 Allen 㔬]',
-		  shorttitle            	    = 'MkSess MSOsc RsiST ZLag oon dya TSId xPanels [🎱 Allen 㔬]',
+indicator(title							= 'FxMarketSessions & MarketStructureOscil & Rsi Supertrend & ZeroLag & Aroon & Vidya & TSI Diverg & xPanels [🎱 Allen 㔬]',
+		  shorttitle            	    = 'MkS MSOsc RsiST ZLag oo/dya TSId xPnl [🎱 Allen 㔬]',
 		  overlay						= true,
 		  max_boxes_count				= 500,
 		  max_labels_count				= 500,
 		  max_lines_count				= 500,
 		  max_bars_back					= 1000,
-		  format						= format.price,
+		  format						= format.price,		// format.percent,
 		  precision						= 4)
 
 //// ─────────────────────────────────────────────────────────────────────
 
-/// ───────────────────────
+//// ───────────────────────
 /// ─── Globals
-/// ───────────────────────
+//// ───────────────────────
 
 strGlobalExtendTooltip					= 'Indicador TSI basado en tendencia'
 strGlobalOptionalTooltip				= 'Configuración de temporalidad adicional'
@@ -42,9 +44,9 @@ strGlobalColorSelector					= input.string 	(defval = "Allen",		title = "Color Se
 			//   options					=				['Allen', 'Ultr', 'Inverse', 'Classic', 'Light', 'Mono'])
 float insGlobalTFCoefficient			= 				2
 
-/// ───────────────────────
+//// ───────────────────────
 /// ─── Switch
-/// ───────────────────────
+//// ───────────────────────
 
 [_co_gbl_buy,	_co_gbl_sell,	_co_gbl_long,	_co_gbl_short,	_co_gbl_neutral]										= switch	strGlobalColorSelector
 	"Allen"								=> [#33FFAC,		#CCF8FF,		#ADEB42,		#EA1889,		#CCF8FF]
@@ -55,24 +57,24 @@ float insGlobalTFCoefficient			= 				2
 	// "Inverse"						=> [#ADEB42,		#EA1889,		#33FFAC,		#CCF8FF,		#CCF8FF]
 	// "Classic"						=> [#B1FF05,		#D11C36,		#B1FF05,		#D11C36,		#5C818A]
 
-/// ───────────────────────
+//// ───────────────────────
 /// ─── Colors
-/// ───────────────────────
+//// ───────────────────────
 
 _co_gbl_white							= #E6F7FF			//	CitiAccentUltraLightBlue			= #E6F7FF
 _co_gbl_pink							= #FFB7FF			//	WavBehPink20						= #FFB7FF
-_co_gbl_sky								= #0CF2F2			//	WavBehAqua50						= #0CF2F2
+_co_gbl_sky								= #0CF2F2			//	WavBehAqua50						= #0CF2F2	// SurfeSky400				= #88D7F0
 _co_gbl_mint							= #4FFFC0			//	AllenMint50							= #4FFFC0
 _co_gbl_green							= #30d453			//	AllenGreen50						= #30d453
 _co_gbl_yellow							= #FDF43C			//	BrLiYel30							= #FDF43C
-_co_gbl_blue							= #0035FF			//	ARoPrimary							= #0035FF
+_co_gbl_blue							= #0035FF			//	ARoPrimary							= #0035FF	// SurfeSky800				= #1798C1
 _co_gbl_black							= #0C1633			//	PlatziBlue80						= #0C1633
 _co_gbl_light							= #FBFD73			//	BrLiYel10							= #FBFD73
 _co_gbl_txt_dark						= #121F3D			//	PlatziBlue70						= #121F3D
 
-/// ───────────────────────
+//// ───────────────────────
 /// ─── Types
-/// ───────────────────────
+//// ───────────────────────
 
 type globalTypeOHL
 	float O						    	= open
@@ -82,9 +84,9 @@ type globalTypeOHL
 	float V				    			= volume
 	int   I				    			= bar_index
 
-/// ───────────────────────
+//// ───────────────────────
 /// ─── Functions
-/// ───────────────────────
+//// ───────────────────────
 
 /// ─── function timeframe
 FunGlobalTimeFrame(_timeframe) =>
@@ -621,12 +623,14 @@ if showFxMkSs_KillNwYClose
 /// ║	ZeroLag Trend				║
 /// ╚═══════════════════════════════╝
 
-/// ───────────────────────
-/// ＩＮＰＵＴＳ
-/// ───────────────────────
+//// ─────────────────────────────────────────────────────────────────────
 
-co_zeLag_up							= _co_gbl_green			//	#30d453
-co_zeLag_dn							= _co_gbl_short			//	#4043f1
+//// ───────────────────────
+/// ＩＮＰＵＴＳ
+//// ───────────────────────
+
+co_zeLag_up							= _co_gbl_green			//	#30D453
+co_zeLag_dn							= _co_gbl_white			//	#4043F1
 co_zeLag_signal						= _co_gbl_white
 co_zeLag_text						= _co_gbl_light
 co_zeLag_text_dark					= _co_gbl_txt_dark
@@ -639,9 +643,9 @@ zeLag_length						= input.int		(13,			title = 'Longitud',					group = zeLag_Grou
 var bZeLag_BOX						= box(na)
 series float iZeLag_ATR				= ta.atr(200)
 
-/// ───────────────────────
+//// ───────────────────────
 /// ＣＡＬＣＵＬＡＴＩＯＮＳ
-/// ───────────────────────
+//// ───────────────────────
 
 series float iZeLag_EMA				= ta.ema(gblSource.C, zeLag_length)
 series float iZeLag_EMA50				= ta.ema(gblSource.C, 50)
@@ -683,9 +687,9 @@ if showZeLag_level_box and showZeLag_trend
 		not zeLag_signal_buy or not zeLag_signal_sell => bZeLag_BOX.set_right(bar_index + 4)  
 		=> bZeLag_BOX := box(na) // Otherwise, reset the box
 
-/// ───────────────────────
+//// ───────────────────────
 /// ＰＬＯＴ
-/// ───────────────────────
+//// ───────────────────────
 
 // Plot the Zero-Lag Moving Average
 plot(showZeLag_trend ? iZeLag_EMA : na,						color = color.new(co_zeLag_EMA,		50),											linewidth = 3,		force_overlay		= true)
@@ -1070,27 +1074,27 @@ fill				(msPlot, midLine,  cycleOpt ? 40 : 50,  0, top_color = color.new(co_msOs
 
 //// ─────────────────────────────────────────────────────────────────────
 
-co_sTrend_Up					= _co_gbl_buy
-co_sTrend_Down					= _co_gbl_sell
-co_sTrend_RSI					= _co_gbl_white			// AmeTrBlueFrost
-co_sTrend_Dark					= _co_gbl_black			// PlatziBlue70
+co_sTrend_Up						= _co_gbl_buy
+co_sTrend_Down						= _co_gbl_sell
+co_sTrend_RSI						= _co_gbl_white			// AmeTrBlueFrost
+co_sTrend_Dark						= _co_gbl_black			// PlatziBlue70
 
 //// ───────────────────────
 /// ─── Supertrend Rsi
 /// ─── Variables ────
 //// ───────────────────────
 
-show_sTrendSTrend				= input.bool	(defval = true,			title = 'Visualizar Supertrend',	group = 'RSI Settings')
+show_sTrendSTrend					= input.bool	(defval = true,			title = 'Visualizar Supertrend',	group = 'RSI Settings')
 
-sTrendRSILength					= input.int		(defval = 14,			title = 'Longitud RSI',				group = 'RSI Settings')
-sTrendSmoothLength				= input.int		(defval = 21,			title = 'Longitud RSI Suavisado',	group = 'RSI Settings')
-show_sTrendISmoothed			= input.bool	(defval = false,		title = 'Suavisado RSI',			group = 'RSI Settings')
+sTrendRSILength						= input.int		(defval = 14,			title = 'Longitud RSI',				group = 'RSI Settings')
+sTrendSmoothLength					= input.int		(defval = 21,			title = 'Longitud RSI Suavisado',	group = 'RSI Settings')
+show_sTrendISmoothed				= input.bool	(defval = false,		title = 'Suavisado RSI',			group = 'RSI Settings')
 
-sTrendMALength					= input.int		(defval = 14,			title = 'Longitud MA',				group = 'MA Settings',			display = display.data_window)
-sTrendMAType					= input.string	(defval = 'HMA',		title = 'Tipo MA',					group = 'MA Settings',			options = ['SMA', 'HMA', 'EMA', 'SMMA', 'WMA', 'VWMA'],	display = display.data_window)
+sTrendMALength						= input.int		(defval = 14,			title = 'Longitud MA',				group = 'MA Settings',			display = display.data_window)
+sTrendMAType						= input.string	(defval = 'HMA',		title = 'Tipo MA',					group = 'MA Settings',			options = ['SMA', 'HMA', 'EMA', 'SMMA', 'WMA', 'VWMA'],	display = display.data_window)
 
-sTrendFactor					= input.float	(defval = 0.8,			title = 'Factor',					group = 'Super Trend Settings')
-sTrendATRLength					= input.int		(defval = 10,			title = 'Longitud ATR',				group = 'Super Trend Settings')
+sTrendFactor						= input.float	(defval = 0.8,			title = 'Factor',					group = 'Super Trend Settings')
+sTrendATRLength						= input.int		(defval = 10,			title = 'Longitud ATR',				group = 'Super Trend Settings')
 
 //// ───────────────────────
 /// ─── Supertrend Rsi
@@ -1099,9 +1103,9 @@ sTrendATRLength					= input.int		(defval = 10,			title = 'Longitud ATR',				grou
 
 /// ─── function calculate ATR
 FussTrend_CalculateATR(_source, _atr_length) =>
-	_highest_high				= ta.highest(_source, _atr_length)
-	_lowest_low					= ta.lowest(_source, _atr_length)
-	_true_range					= na(_highest_high[1]) ? _highest_high - _lowest_low : math.max(_highest_high - _lowest_low, math.abs(_highest_high - _source[1]), math.abs(_lowest_low - _source[1]))
+	_highest_high					= ta.highest(_source, _atr_length)
+	_lowest_low						= ta.lowest(_source, _atr_length)
+	_true_range						= na(_highest_high[1]) ? _highest_high - _lowest_low : math.max(_highest_high - _lowest_low, math.abs(_highest_high - _source[1]), math.abs(_lowest_low - _source[1]))
 	ta.rma(_true_range, _atr_length)
 
 //// ───────────────────────
@@ -1111,29 +1115,29 @@ FussTrend_CalculateATR(_source, _atr_length) =>
 
 /// ─── Function to calculate Supertrend
 FussTrend_CalculateSupertrend(_factor, _atr_length, _source) =>
-	_price_source						= _source
-	_atr								= FussTrend_CalculateATR(_source, _atr_length)
-	_upper_band							= _price_source + _factor * _atr
-	_lower_band							= _price_source - _factor * _atr
-	_prev_lowerband						= nz(_lower_band[1])
-	_prev_upperband						= nz(_upper_band[1])
-	_lower_band							:= _lower_band > _prev_lowerband or _source[1] < _prev_lowerband ? _lower_band : _prev_lowerband
-	_upper_band							:= _upper_band < _prev_upperband or _source[1] > _prev_upperband ? _upper_band : _prev_upperband
-	int _trend_direction				= na
-	float _supertrend_value				= na
-	FusTPrevSupertrend					= _supertrend_value[1]
+	_price_source					= _source
+	_atr							= FussTrend_CalculateATR(_source, _atr_length)
+	_upper_band						= _price_source + _factor * _atr
+	_lower_band						= _price_source - _factor * _atr
+	_prev_lowerband					= nz(_lower_band[1])
+	_prev_upperband					= nz(_upper_band[1])
+	_lower_band						:= _lower_band > _prev_lowerband or _source[1] < _prev_lowerband ? _lower_band : _prev_lowerband
+	_upper_band						:= _upper_band < _prev_upperband or _source[1] > _prev_upperband ? _upper_band : _prev_upperband
+	int _trend_direction			= na
+	float _supertrend_value			= na
+	FusTPrevSupertrend				= _supertrend_value[1]
 	if na(_atr[1])
-		_trend_direction				:= 1
-	else if FusTPrevSupertrend			== _prev_upperband
-		_trend_direction				:= _source > _upper_band ? -1 : 1
+		_trend_direction			:= 1
+	else if FusTPrevSupertrend		== _prev_upperband
+		_trend_direction			:= _source > _upper_band ? -1 : 1
 	else
-		_trend_direction				:= _source < _lower_band ? 1 : -1
-	_supertrend_value					:= _trend_direction == -1 ? _lower_band : _upper_band
+		_trend_direction			:= _source < _lower_band ? 1 : -1
+	_supertrend_value				:= _trend_direction == -1 ? _lower_band : _upper_band
 	[_supertrend_value, _trend_direction]
 
 /// ─── Calculete Rsi ───────
-sTrend_RsiValue							= show_sTrendISmoothed and show_sTrendSTrend ? ta.hma(ta.rsi(gblSource.C, sTrendRSILength), sTrendSmoothLength) : ta.rsi(gblSource.C, sTrendRSILength)
-// sTrendRsiMovingAverage					= FunGlobalCalculateMA(sTrend_RsiValue, sTrendMALength, sTrendMAType)
+sTrend_RsiValue						= show_sTrendISmoothed and show_sTrendSTrend ? ta.hma(ta.rsi(gblSource.C, sTrendRSILength), sTrendSmoothLength) : ta.rsi(gblSource.C, sTrendRSILength)
+// sTrendRsiMovingAverage		= FunGlobalCalculateMA(sTrend_RsiValue, sTrendMALength, sTrendMAType)
 
 /// ─── Calculating Supertrend based on RSI values
 [sTrendRsiSupertrend, FusTTrendDirection] = FussTrend_CalculateSupertrend(sTrendFactor, sTrendATRLength, sTrend_RsiValue)
@@ -1144,8 +1148,8 @@ sTrend_RsiValue							= show_sTrendISmoothed and show_sTrendSTrend ? ta.hma(ta.r
 //// ───────────────────────
 
 /// ─── Plot RSI / MA
-plot_sTrend_Strend						= plot(sTrendRsiSupertrend,		color = FusTTrendDirection == -1 ? co_sTrend_Up : co_sTrend_Down,							title = 'Supertrend')
-plot_sTrend_Rsi							= plot(sTrend_RsiValue,			color = FusTTrendDirection == -1 ? co_sTrend_Up : co_sTrend_Down,			linewidth = 1,	title = '')
+plot_sTrend_Strend					= plot(sTrendRsiSupertrend,		color = FusTTrendDirection == -1 ? co_sTrend_Up : co_sTrend_Down,							title = 'Supertrend')
+plot_sTrend_Rsi						= plot(sTrend_RsiValue,			color = FusTTrendDirection == -1 ? co_sTrend_Up : co_sTrend_Down,			linewidth = 1,	title = '')
 
 /// ─── Lines OverBought / OverSold
 plot(110,			color = color.from_gradient(sTrend_RsiValue,	60,	80,	color.new(co_sTrend_Dark, 70),		color.new(co_sTrend_Down, 0)),		linewidth = 6)
@@ -1161,3 +1165,121 @@ fill(plot_sTrend_Strend, plot_sTrend_Rsi, sTrend_RsiValue, sTrendRsiSupertrend, 
 
 
 /// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+
+/// ╔═══════════════════════════════╗
+/// ║	Aroon Oscillator			║
+/// ║	@	Allen	㔬				║
+/// ╚═══════════════════════════════╝
+
+//// ─────────────────────────────────────────────────────────────────────
+
+// ＩＮＰＵＴＳ ―――――――――――――――――――
+
+co_oonOsc_buy						= _co_gbl_green
+co_oonOsc_sell						= _co_gbl_blue
+co_oonOsc_line						= _co_gbl_white
+
+oonOsc_groupvars					= 'Arooon Oscillator'
+show_oonOscAroon					= input.bool	(defval = true,		title = 'Visualizar Aroon',	group = oonOsc_groupvars)
+oonOsc_length						= input.int		(defval = 42,		title = "Longitud",			group = oonOsc_groupvars)			// 29
+oonOsc_smooth						= input.int		(defval = 10,		title = "Smooth",			group = oonOsc_groupvars)			// 25
+oonOsc_sign_length					= input.int		(defval = 10,		title = "Signal",			group = oonOsc_groupvars)			// 10
+oonOsc_gain_limit					= 10
+
+// show_oonOsc_m_reversion				= input.bool	(true,				title = "Aroon Corrección",				group = "Signals")
+
+// ＣＡＬＣＵＬＡＴＩＯＮＳ―――――――――
+
+// Zero Lag Function John Ehlers
+Fun_oonOsc_zero_lag(_source, _length, _gain_limit) =>
+	// Initialize variables
+	float _alpha					= 2 / (_length + 1)
+	float _ema						= na
+	float _ecu						= na
+	float _least_error				= 1000000
+	float _best_gain				= 0
+
+	_ema							:= na(_ema[1]) ? _source : _alpha * _source + (1 - _alpha) * nz(_ema[1])
+
+	// Loop to find the best gain
+	for int _value					= -_gain_limit to _gain_limit
+		_gain						= _value / 10
+		_ecu						:= na(_ecu[1]) ? _source : _alpha * (_ema + _gain * (_source - nz(_ecu[1]))) + (1 - _alpha) * nz(_ecu[1])
+
+		float _error				= _source - _ecu
+
+		// Check if this gain results in a smaller error
+		if math.abs(_error) < _least_error
+			_least_error			:= math.abs(_error)
+			_best_gain				:= _gain
+
+	_ecu							:= na(_ecu[1]) ? _source : _alpha * (_ema + _best_gain * (_source - nz(_ecu[1]))) + (1 - _alpha) * nz(_ecu[1])
+	_ecu
+
+Fun_oonOsc_calculate_aroon(simple int _length, _smooth) =>
+	_aroonDown						= 100 * (ta.lowestbars(low, _length) + _length) / _length
+	_aroonUp						= 100 * (ta.highestbars(high, _length) + _length) / _length
+	_source							= _aroonUp - _aroonDown
+	_gain_limit						= oonOsc_gain_limit
+	Fun_oonOsc_zero_lag				(_source, _smooth, _gain_limit)
+
+oonOsc_multip						= 50
+fOnOsc_aroon_osc					= Fun_oonOsc_calculate_aroon(oonOsc_length, oonOsc_smooth) + oonOsc_multip
+fOnOsc_sig_line						= ta.sma(fOnOsc_aroon_osc, oonOsc_sign_length)
+
+// ＰＬＯＴ ―――――――――――――――――――――――
+
+oonOsc_plot_line1					= plot(show_oonOscAroon ? fOnOsc_aroon_osc : na,	title = "Oscilador Aroon",	color = color.from_gradient(fOnOsc_aroon_osc, -80 + oonOsc_multip, 80 + oonOsc_multip, co_oonOsc_sell, co_oonOsc_buy))
+oonOsc_plot_line_mid				= plot(show_oonOscAroon ? 0 + oonOsc_multip : na,	title = "Linea media",		color = color.new(co_oonOsc_line, 70))
+
+plot(show_oonOscAroon ? fOnOsc_sig_line : na, "Señal", color = bar_index % 2 == 0 ? color.new(co_oonOsc_line, 70) : na)
+
+fill(oonOsc_plot_line1,				oonOsc_plot_line_mid,		0 + oonOsc_multip, -100 + oonOsc_multip,	na, co_oonOsc_sell)
+fill(oonOsc_plot_line1,				oonOsc_plot_line_mid,		100 + oonOsc_multip, 0 + oonOsc_multip,		co_oonOsc_buy, na)
+
+bgcolor(show_oonOscAroon and ta.crossover(fOnOsc_aroon_osc, 0) ? color.new(co_oonOsc_buy, 85) : na)
+bgcolor(show_oonOscAroon and ta.crossunder(fOnOsc_aroon_osc, 0) ? color.new(co_oonOsc_sell, 85) : na)
+
+if barstate.islast and show_oonOscAroon
+	label.delete(
+		 label.new(bar_index, fOnOsc_aroon_osc, str.tostring(math.round(fOnOsc_aroon_osc), format.percent),
+				 color				= color(na), 
+				 textcolor			= fOnOsc_aroon_osc > 0 ? co_oonOsc_buy : co_oonOsc_sell, 
+				 style				= label.style_label_left)[1]
+				 )
+
+// if show_oonOsc_m_reversion
+// 	if ta.crossover(fOnOsc_aroon_osc, fOnOsc_sig_line)
+// 		label.new(bar_index, low, "●\nreversion\nup", 
+// 				 color			= color(na), 
+// 				 textcolor		= color.new(co_oonOsc_buy, 50), 
+// 				 style			= label.style_label_up, 
+// 				 force_overlay	= true)
+
+// 	if ta.crossunder(fOnOsc_aroon_osc, fOnOsc_sig_line) 
+// 		label.new(bar_index, high, "reversion\ndown\n●", 
+// 				 color			= color(na), 
+// 				 textcolor		= co_oonOsc_sell, 
+// 				 style			= label.style_label_down, 
+// 				 force_overlay	= true)
+
+plotchar(ta.crossover(fOnOsc_aroon_osc,		fOnOsc_sig_line) ? fOnOsc_aroon_osc[1] : na,
+		  title						= "cruce reversion ▲",
+		  char						= "●", 
+		  location					= location.absolute, 
+		  color						= co_oonOsc_buy,
+		  size						= size.tiny, 
+		  offset					= -1)
+
+plotchar(ta.crossunder(fOnOsc_aroon_osc,	fOnOsc_sig_line) ? fOnOsc_aroon_osc[1] : na,
+		  title						= "cruce reversion ▼",
+		  char						= "●", 
+		  location					= location.absolute, 
+		  color						= co_oonOsc_sell, 
+		  size						= size.tiny, 
+		  offset					= -1)
+
+bgcolor(fOnOsc_aroon_osc > 0 ? color.new(co_oonOsc_buy, 95) : color.new(co_oonOsc_sell, 95))
+
+
+/// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■

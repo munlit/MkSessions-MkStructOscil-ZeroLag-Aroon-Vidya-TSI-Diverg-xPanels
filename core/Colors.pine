@@ -327,11 +327,7 @@
 	// CitiAccentForest							= #00843D
 	// CitiAccentTeal							= #007377
 	// CitiAccentAqua							= #00B0B9
-	// CitiProductCredito						= #056DAE
 	// CitiAccountMaestra						= #343434
-	// CitiAccountEjecutivo						= #666
-	// CitiAccountPerfiles						= #056DAE
-	// CitiSegmentPrivada						= #000
 	// CitiSegmentPriority						= #0E2A48
 	// CitiSegmentPatrimonial					= #B4975A
 	// CitiCardMartiClasica						= #1A2E52
@@ -339,7 +335,7 @@
 	// CitiCardPremia							= #1A2E52
 	// CitiCardTeleton							= #653279
 	// CitiCardRewards							= #065C77
-	// CitiCardPrestige							= #666
+	// CitiCardPrestige							= #666666
 	// CitiCardPumas							= #1A2E52
 	// CitiCardMartiPremium						= #2B2B2B
 	// CitiCardSimplicity						= #1A2E52
@@ -350,7 +346,6 @@
 	// CitiCardAadvantage						= #998847
 	// CitiCitiR1								= #ED1C24
 	// CitiCitiB3								= #3ABAED
-	// CitiCitiB2								= #056DAE
 	// CitiCitiB1								= #1A2E52
 	// CitiSystemUltraLightWarning				= #FFFBF2
 	// CitiSystemUltraLightSuccess				= #F4FFF2
@@ -364,7 +359,6 @@
 	// CitiSystemSuccess						= #093
 	// CitiSystemInfo							= #0059B3
 	// CitiSystemError							= #C00
-	// CitiMonoWhite							= #FFF
 	// CitiMonoUltraLightGray					= #F8F8F8
 	// CitiMonoLightGray						= #D3DAEA
 	// CitiMonoMediumGray						= #ACB3BF
