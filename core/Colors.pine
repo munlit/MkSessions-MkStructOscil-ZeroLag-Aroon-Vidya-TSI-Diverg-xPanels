@@ -389,6 +389,24 @@
 	// BrLiYel40								= #FEF301								// BrightLineBackground Yellow Nit
 	// BrLiYel50								= #FFDB00								// BrightLineBackground Yellow Base
 
+/// ─── Capitalise ───
+	// CapitGglobalPrimary						= #4BEBC2
+	// CapitGglobalSecondary					= #846CFF
+	// CapitGglobalText							= #090D2E
+	// CapitGglobalGray							= #F6F6F6
+	// CapitGglobalLight						= #F5F8FF
+	// CapitGglobalLila							= #EBF1FF
+	// CapitGglobalSky							= #8ed1fc
+	// CapitGglobalCyan							= #7bdcb5
+	// CapitGglobalPink							= #f78da7
+	// CapitGglobalPurple						= #9b51e0
+	// CapitGglobalGreen						= #00d084
+	// CapitGglobalOrange						= #ff6900
+	// CapitGglobalAmber						= #fcb900
+	// CapitGglobalDanger						= #FF9E57
+	// CapitGglobalBlue							= #0081E2
+	// CapitGglobalDark							= #37404D
+
 /// ─── Waves Beh ───
 	// WavBehPink20								= #FFB7FF								// WavBehPink20
 	// WavBehFucsia50							= #DF36DF								// WavBehFucsia50
