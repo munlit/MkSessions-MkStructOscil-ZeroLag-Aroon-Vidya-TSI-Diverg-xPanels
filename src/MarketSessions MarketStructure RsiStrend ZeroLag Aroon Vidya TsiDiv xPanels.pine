@@ -308,7 +308,10 @@ co_zeLag_EMA							= iZeLag_EMAx	< iZeLag_EMA		? co_zeLag_buy	: co_zeLag_sell			
 // Method to draw a box on the chart
 method FUN_zeLag_draw_box(color _color, top, _bottom, price) =>
 	box.new(
-			 bar_index, top, bar_index, _bottom, _color, 1, 
+			 bar_index, top, bar_index, _bottom,
+			 border_color				= color.new(_color, 50),
+			 border_width				= 1,
+			 border_style				= line.style_dotted,
 			 bgcolor					= color.new(_color, 90), 
 			 text						= str.tostring(math.round(price, 2)), 
 			 text_size					= size.tiny,
@@ -340,8 +343,9 @@ if showZeLag_level_box and showZeLag_trend
 // Plot the Zero-Lag Moving Average
 plot_zeLag_EMA							= plot(showZeLag_trend ? iZeLag_EMA : na,			color = color.new(co_zeLag_EMA, 25),			linewidth = 1,		force_overlay		= true)
 plot_zeLag_EMAx							= plot(showZeLag_trend ? iZeLag_EMAx : na,			color = color.new(co_zeLag_EMAx, 25),			linewidth = 2,		force_overlay		= true)
-plot_zeLag_ZLMA							= plot(showZeLag_trend ? iZeLag_ZLMA : na,			color = color.new(co_zeLag_ZLMA, 75),			linewidth = 1,		force_overlay		= true)
-fill(plot_zeLag_ZLMA, plot_zeLag_EMAx, iZeLag_ZLMA, iZeLag_EMAx,							color.new(co_zeLag_EMAx, 90),					color.new(co_zeLag_EMA, 70))
+// plot_zeLag_ZLMA							= plot(showZeLag_trend ? iZeLag_ZLMA : na,			color = color.new(co_zeLag_ZLMA, 75),			linewidth = 1,		force_overlay		= true)
+fill(plot_zeLag_EMA, plot_zeLag_EMAx, iZeLag_EMA, iZeLag_EMAx,							color.new(co_zeLag_EMAx, 90),					color.new(co_zeLag_EMA, 70))
+// fill(plot_zeLag_ZLMA, plot_zeLag_EMAx, iZeLag_ZLMA, iZeLag_EMAx,							color.new(co_zeLag_EMAx, 90),					color.new(co_zeLag_EMA, 70))
 // fill(plot_zeLag_ZLMA, plot_zeLag_EMA, iZeLag_ZLMA, iZeLag_EMA,							color.new(co_zeLag_ZLMA, 90),					color.new(co_zeLag_EMA, 60))
 
 // // Plot shapes for up and down signals
@@ -360,19 +364,6 @@ fill(plot_zeLag_ZLMA, plot_zeLag_EMAx, iZeLag_ZLMA, iZeLag_EMAx,							color.new
 // 		  color							= co_zeLag_sell,
 // 		  size							= size.tiny,
 // 		  force_overlay					= true)
-
-//	testing variables
-if barstate.islast and showZeLag_trend
-	label.delete(
-		 label.new(bar_index + 10, iZeLag_ZLMA, 
-		//  label.new(bar_index + 10, high, 
-		 'Compra: ' + str.tostring(iZeLag_ZLMA, format.mintick) + '\n' +
-		 'Venta: ' + str.tostring(iZeLag_EMA, format.mintick),
-		 color							= color.new(co_zeLag_signal, 50),
-		 style							= label.style_label_left, 
-		 textcolor						= co_zeLag_text_dark,
-		 force_overlay					= true
-		 )[1])
 
 
 /// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
@@ -553,13 +544,16 @@ string vVidya_delta_volume =
 /// ＰＬＯＴ ――――――――――――――――――――――――――――――
 
 _fvVi_show								= show_vVidya_shadow
-_fvVi_opacity							= 60
+_fvVi_opacity							= 70
 _fvVi_opacity_none						= 100
 _fvVi_line_width						= 2
 _fvVi_line_style						= plot.style_linebr
 
+col_vVidya_plotBuy						= color.new(col_vVidya_uptrend, 50)
+col_vVidya_plotSell						= color.new(col_vVidya_downtrend, 50)
+
 // Determine the color of the trend
-_fvVi_color_conditional					= vVidya_trend_up ? col_vVidya_uptrend : not vVidya_trend_up ? col_vVidya_downtrend : chart.fg_color
+_fvVi_color_conditional					= vVidya_trend_up ? col_vVidya_plotBuy : not vVidya_trend_up ? col_vVidya_plotSell : chart.fg_color
 
 _fvVi_value_up							= vVidya_smoothed_value
 _fvVi_value_dn							= hl2
@@ -744,8 +738,8 @@ vFxMkSs_SessSdExtend					= input.string	(vFxMkSs_No,			title = 'Extender',						
 optFxMkSs_LineStyle						= input.string	('····',				title = 'Box style', 										group = fxMrkSsGroupLine,
 		  options						= 				['⎯⎯⎯⎯', '----', '····'])
 vFxMkSs_BorderWidth						= input.int		(1,						title = 'Ancho de Linea',	minval = 0,						group = fxMrkSsGroupLine)
-vFxMkSs_BgOpacity						= input.int		(92,					title = 'Transp fondo', minval = 0,maxval = 100,step = 1,	group = fxMrkSsGroupLine,			tooltip = 'Setting the 100 is no background color')
-vFxMkSs_LineOpacity						= input.int		(40,					title = 'Transp contorno',minval = 0,maxval = 100,step = 1,	group = fxMrkSsGroupLine,			tooltip = 'Setting the 100 is no background color')
+vFxMkSs_BgOpacity						= input.int		(90,					title = 'Transp fondo', minval = 0,maxval = 100,step = 1,	group = fxMrkSsGroupLine,			tooltip = 'Setting the 100 is no background color')
+vFxMkSs_LineOpacity						= input.int		(30,					title = 'Transp contorno',minval = 0,maxval = 100,step = 1,	group = fxMrkSsGroupLine,			tooltip = 'Setting the 100 is no background color')
 
 /// ─── Labels
 showFxMkSs_Labels						= input.bool	(true,					title = 'Información',										group = fxMrkSsGroupTag,			inline = 'label_show') and vFxMkSs_Show
@@ -1356,7 +1350,7 @@ if msOnChart3
 //// ───────────────────────
 
 /// ─── Lineal
-midLine				= plot(msOsc_Show or show_msOscRange1 or show_msOscRange2 or show_msOscRange3 ? 50 : na,	'Equilibrio',		color.new(msOscilColorMid, 50),	display = display,		editable = false)
+midLine				= plot(msOsc_Show or show_msOscRange1 or show_msOscRange2 or show_msOscRange3 ? 50 : na,	'Equilibrio',		color.new(msOscilColorMid, 80),	display = display,		editable = false)
 
 [stValue1, stValue2, stValue3] = Fun_msOsc_collectData()
 
@@ -1553,7 +1547,7 @@ if barstate.islast and show_oonOscAroon
 				 style					= label.style_label_left)[1]
 				 )
 
-// // if show_oonOscAroon
+// if show_oonOscAroon
 // oonOsc_cross_over					= show_oonOscAroon and ta.crossover(fOnOsc_aroon_osc,		fOnOsc_sig_line) ? fOnOsc_aroon_osc[1] : na
 // oonOsc_cross_under					= show_oonOscAroon and ta.crossunder(fOnOsc_aroon_osc,		fOnOsc_sig_line) ? fOnOsc_aroon_osc[1] : na
 
@@ -1591,7 +1585,7 @@ bgcolor(fOnOsc_aroon_osc > 0 ? color.new(co_oonOsc_buy, 95) : color.new(co_oonOs
 
 /// ─── Colors ───
 colorTsiMuDiBaseLong					= _co_gbl_long
-colorTsiMuDiBaseShort					= _co_gbl_short
+colorTsiMuDiBaseShort					= _co_gbl_blue
 
 colorTsiMuDiTendency					= _co_gbl_neutral
 colorTsiMuDiMultitimeframe				= _co_gbl_yellow
@@ -1617,6 +1611,7 @@ vTsiMuDiRangeLower						= 2									//	Rango de corrección minimo
 showTsiMuDiPlotDiverg					= input.bool	(defval = true,		title = 'Divergencias',					group = globalTSIGroupTimeframe,		inline = 'diverg show')
 showTsiMuDiPlotDivergScalp				= input.bool	(defval = true,		title = 'Scalp',						group = globalTSIGroupTimeframe,		inline = 'diverg show')
 showTsiMuDiCloudOn						= input.bool	(defval = true,		title = 'TSI Cloud',					group = globalTSIGroupTimeframe)
+vTsiMuDi_RsiLength						= 14
 
 vTsiMuDiSource							= gbl_Source_C
 // vTsiMuDiSource							= gbl_Source_C[0]
@@ -1688,11 +1683,18 @@ insTsiMuDiPlotColor						= iTsiMuDiCalculateTSI			> iTsiMuDiCalculateEma			? col
 /// ─── fill cloud color
 insTsiMuDiCloudColor					= iTsiMuDiCalculateTSI			> iTsiMuDiCalculateEma			? colorTsiMuDiBaseLong	: iTsiMuDiCalculateTSI			<= iTsiMuDiCalculateEma			? colorTsiMuDiBaseShort	: na
 
+/// relatives
+tsiDiInsRSI								= ta.rsi(gbl_Source_C, vTsiMuDi_RsiLength)
+tsiDiInsTSI								= iTsiMuDiCalculateMultiTfTSI
+
 //// ───────────────────────
 /// ─── Display ───
 //// ───────────────────────
 
 /// ─── Plot
+/// plot sobrecompra/sobreventa
+plot(110,								color = color.from_gradient(tsiDiInsTSI,	60,	100,	color.new(_co_gbl_black, 70),		color.new(_co_gbl_sell, 0)),		linewidth = 6)
+plot(-10,								color = color.from_gradient(tsiDiInsTSI,	0,	40,		color.new(_co_gbl_buy, 0),			color.new(_co_gbl_black, 70)),		linewidth = 6)
 
  /// plot multi timeframe
 insTsiMuDiMultitimefTsiPlotLine			= plot(showTsiMuDiTSIMultitimeframe	? arrTsiMuDiMultiTimeframeTicker : na,							color = color.new(colorTsiMuDiMultitimeframe, 60),		linewidth = 2)
@@ -1734,12 +1736,6 @@ tsiDiInsOSCHL							= iTsiMuDiCalculateTSI[vTsiMuDiLBR]	> ta.valuewhen(insTsiMuD
 tsiDiInsPRICELL							= low[vTsiMuDiLBR]					< ta.valuewhen(insTsiMuDiPLFound, low[vTsiMuDiLBR], 1)
 tsiDiInsBULLCond						= showTsiMuDiPlotDiverg				and tsiDiInsPRICELL	and tsiDiInsOSCHL	and insTsiMuDiPLFound
 
-// plot(showTsiMuDiTSIDivergs				and insTsiMuDiPLFound				? iTsiMuDiCalculateTSI[vTsiMuDiLBR] : na,
-// 			  offset					= -vTsiMuDiLBR,
-// 			  title						= 'Confirmacion de Compra',
-// 			  linewidth					= 2,
-// 			  color						= tsiDiInsBULLCond ? color.new(colorTsiMuDiDivergLong, 10) : colorTsiMuDiDivergNone)
-
 plotshape(showTsiMuDiTSIDivergs			and	tsiDiInsBULLCond				? iTsiMuDiCalculateTSI[vTsiMuDiLBR] : na,
 			  offset					= -vTsiMuDiLBR,
 			  title						= 'Etiqueta de Compra',
@@ -1757,12 +1753,6 @@ plotshape(showTsiMuDiTSIDivergs			and	tsiDiInsBULLCond				? iTsiMuDiCalculateTSI
 tsiDiInsOSCLL							= iTsiMuDiCalculateTSI[vTsiMuDiLBR]	< ta.valuewhen(insTsiMuDiPLFound, iTsiMuDiCalculateTSI[vTsiMuDiLBR], 1)	and FunTsiMuDi_inRange(insTsiMuDiPLFound[1])
 tsiDiInsPRICEHL							= low[vTsiMuDiLBR]					> ta.valuewhen(insTsiMuDiPLFound, low[vTsiMuDiLBR], 1)
 tsiDiInsHiddenBullCond					= showTsiMuDiPlotDivergScalp		and tsiDiInsPRICEHL	and tsiDiInsOSCLL	and insTsiMuDiPLFound
-
-// plot(showTsiMuDiTSIDivergs				and insTsiMuDiPLFound				? iTsiMuDiCalculateTSI[vTsiMuDiLBR] : na,
-// 			  offset					= -vTsiMuDiLBR,
-// 			  title						= 'Confirmación de Compra trend',
-// 			  linewidth					= 2,
-// 			  color						= tsiDiInsHiddenBullCond ? color.new(colorTsiMuDiDivergLong, 40) : colorTsiMuDiDivergNone)
 
 plotshape(showTsiMuDiTSIDivergs			and tsiDiInsHiddenBullCond			? iTsiMuDiCalculateTSI[vTsiMuDiLBR] : na,
 			  offset					= -vTsiMuDiLBR,
@@ -1782,12 +1772,6 @@ tsiDiInsOSCLH							= iTsiMuDiCalculateTSI[vTsiMuDiLBR]	< ta.valuewhen(insTsiMuD
 tsiDiInsPRICEHH							= high[vTsiMuDiLBR]					> ta.valuewhen(insTsiMuDiPHFound, high[vTsiMuDiLBR], 1)
 tsiDiInsBEARCond						= showTsiMuDiPlotDiverg				and tsiDiInsPRICEHH	and tsiDiInsOSCLH	and insTsiMuDiPHFound
 
-// plot(showTsiMuDiTSIDivergs				and insTsiMuDiPHFound				? iTsiMuDiCalculateTSI[vTsiMuDiLBR] : na,
-// 			  offset					= -vTsiMuDiLBR,
-// 			  title						= 'Confirmación de Venta',
-// 			  linewidth					= 2,
-// 			  color						= tsiDiInsBEARCond ? color.new(colorTsiMuDiDivergShort, 10) : colorTsiMuDiDivergNone)
-
 plotshape(showTsiMuDiTSIDivergs			and tsiDiInsBEARCond				? iTsiMuDiCalculateTSI[vTsiMuDiLBR] : na,
 			  offset					= -vTsiMuDiLBR,
 			  title						= 'Etiqueta de Venta',
@@ -1806,12 +1790,6 @@ tsiDiInsOSCHH							= iTsiMuDiCalculateTSI[vTsiMuDiLBR]	> ta.valuewhen(insTsiMuD
 tsiDiInsPRICELH							= high[vTsiMuDiLBR]					< ta.valuewhen(insTsiMuDiPHFound, high[vTsiMuDiLBR], 1)
 tsiDiInsHiddenBearCond					= showTsiMuDiPlotDivergScalp		and tsiDiInsPRICELH	and tsiDiInsOSCHH	and insTsiMuDiPHFound
 
-// plot(showTsiMuDiTSIDivergs				and insTsiMuDiPHFound				? iTsiMuDiCalculateTSI[vTsiMuDiLBR] : na,
-// 			  offset					= -vTsiMuDiLBR,
-// 			  title						= 'Confirmación de Venta trend',
-// 			  linewidth					= 2,
-// 			  color						= tsiDiInsHiddenBearCond ? color.new(colorTsiMuDiDivergShort, 40) : colorTsiMuDiDivergNone)
-
 plotshape(showTsiMuDiTSIDivergs			and tsiDiInsHiddenBearCond			? iTsiMuDiCalculateTSI[vTsiMuDiLBR] : na,
 			  offset					= -vTsiMuDiLBR,
 			  title						= 'Etiqueta de Venta trend',
@@ -1820,6 +1798,134 @@ plotshape(showTsiMuDiTSIDivergs			and tsiDiInsHiddenBearCond			? iTsiMuDiCalcula
 			  location					= location.absolute,
 			  color						= color.new(colorTsiMuDiDivergShort, 40),
 			  textcolor					= colorTsiMuDiText)
+
+
+/// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+
+
+/// ╔═══════════════════════════════════╗
+/// ║	Panel Tsi MultiTrend			║
+/// ║	Panel Multi Indicator			║
+/// ║	@	Allen.						║
+/// ╚═══════════════════════════════════╝
+
+//// ─────────────────────────────────────────────────────────────────────
+
+//// ───────────────────────
+/// ─── TSI Obs MTF ───
+/// ─── TSI Box ───
+//// ───────────────────────
+
+colorTsiObsPnl_Buy						= _co_gbl_long
+colorTsiObsPnl_Sell						= _co_gbl_short
+colorTsiObsPnl_Neutral					= _co_gbl_neutral
+colorTsiObsPnl_White					= _co_gbl_white
+colorTsiObsPnl_Black					= _co_gbl_black
+colorTsiObsPnl_TextDark					= _co_gbl_txt_dark
+colorTsiObsPnl_TextLight				= _co_gbl_white
+colorTsiObsPnl_TiPnBg					= _co_gbl_yellow
+
+/// ─── Inputs
+tsiObsPnlGroupSignal					=				'Signal Panel'
+showTsiObsPnlSignalPanel				= input.bool	(true,				title = 'Panel TSI Signal',		group = tsiObsPnlGroupSignal)
+showTsiObsPnlSignalDelta				= input.bool	(true,				title = 'Delta',				group = tsiObsPnlGroupSignal,			inline = 'signal')
+showTsiObsPnlSignalTsi					= input.bool	(true,				title = 'Tsi',					group = tsiObsPnlGroupSignal,			inline = 'signal')
+showTsiObsPnlSignalMtf					= input.bool	(true,				title = 'Mtf',					group = tsiObsPnlGroupSignal,			inline = 'signal')
+showTsiObsPnlSignalRsi					= input.bool	(true,				title = 'Rsi',					group = tsiObsPnlGroupSignal,			inline = 'signal')
+
+tsiObsPnl_LocatSignalVert				= input.string	(defval = 'Medio',	title = ' Y: ',					group = tsiObsPnlGroupSignal,			inline = 'ubic signal',
+		  options						=				['Arriba', 'Medio','Abajo'])
+tsiObsPnl_LocatSignalHoriz				= input.string	(defval = 'Derecha',title = ' X: ',					group = tsiObsPnlGroupSignal,			inline = 'ubic signal',
+		  options						=				['Izquierda', 'Derecha'])
+
+stTsiObsPnl_TextSize					= input.string	(defval = 'normal',	title = 'Tamaño de texto',
+		  options						= ['auto','tiny','small','normal','large','huge'])
+
+vTsiObsPnl_RsiLength					= 14
+
+/// ───────────────────────
+/// ─── Instances
+/// ───────────────────────
+
+/// ─── RSI
+tsiObsPnlRSI							= tsiDiInsRSI
+
+/// ─── TSI invoke
+tsiObsPnlDELTA							= vVidya_delta_volume
+tsiObsPnlTSI							= iTsiMuDiCalculateMultiTfTSI
+tsiObsPnlMTFRange						= FunGlobalCalculateTimeframeVariant(timeframe.period)
+tsiObsPnlEma							= iTsiMuDiCalculateMultiTfEMA
+
+/// instance function global timeframe
+iTsiObsPnlCalcSignal					= timeframe.period
+
+/// ─── TSI timeframes signal
+[vTsiObsPnlTFSignalTsi,	vTsiObsPnlTFSignalTsi_2,	vTsiObsPnlTFSignalTsi_3,	vTsiObsPnlTFSignalTsi_4]	= request.security(syminfo.tickerid,	iTsiObsPnlCalcSignal,	[tsiObsPnlTSI,	tsiObsPnlTSI[1],	tsiObsPnlTSI[2],	tsiObsPnlTSI[3]],	lookahead = barmerge.lookahead_on)
+[vTsiObsPnlTFSignalEma,	vTsiObsPnlTFSignalEma_2,	vTsiObsPnlTFSignalEma_3,	vTsiObsPnlTFSignalEma_4]	= request.security(syminfo.tickerid,	iTsiObsPnlCalcSignal,	[tsiObsPnlEma,	tsiObsPnlEma[1],	tsiObsPnlEma[2],	tsiObsPnlEma[3]],	lookahead = barmerge.lookahead_on)
+[vTsiObsPnlTFSignalMtf,	vTsiObsPnlTFSignalMtf_2,	vTsiObsPnlTFSignalMtf_3,	vTsiObsPnlTFSignalMtf_4]	= request.security(syminfo.tickerid,	tsiObsPnlMTFRange,		[tsiObsPnlTSI,	tsiObsPnlTSI[1],	tsiObsPnlTSI[2],	tsiObsPnlTSI[3]],	lookahead = barmerge.lookahead_on)
+[vTsiObsPnlTFSignalRsi,	vTsiObsPnlTFSignalRsi_2,	vTsiObsPnlTFSignalRsi_3,	vTsiObsPnlTFSignalRsi_4]	= request.security(syminfo.tickerid,	iTsiObsPnlCalcSignal,	[tsiObsPnlRSI,	tsiObsPnlRSI[1],	tsiObsPnlRSI[2],	tsiObsPnlRSI[3]],	lookahead = barmerge.lookahead_on)
+
+/// ───────────────────────
+/// ─── Functions
+/// ───────────────────────
+
+/// ─── New table signal
+var vTsiPnlNewTableSignal				= table.new(
+		  position						= FunGlobalVertical(tsiObsPnl_LocatSignalVert) + '_' + FunGlobalHorizontal(tsiObsPnl_LocatSignalHoriz),
+		  columns						= 1,
+		  rows							= 6,
+		  border_width					= 2,
+		  frame_color					= color.new(colorTsiObsPnl_Black, 15))
+
+/// ─── Function table delta
+FunTsiObsPnlCalculateDelta(_col, _row, _text, _value) =>
+	_cell_text							= _text + '\n' + _value
+
+	table.cell							(vTsiPnlNewTableSignal, _col, _row, _cell_text,
+		  bgcolor						= color.new(colorTsiObsPnl_TiPnBg, 10),
+  		  text_size						= stTsiObsPnl_TextSize,
+		  text_color					= color.new(colorTsiObsPnl_TextDark, 10)
+		  )
+		//   width							= 3)
+
+
+/// ─── Function table signal
+FunTsiObsPnlCalculateSignal(_col, _row, _title, _var, _var2, _var3, _var4, _min, _max) =>
+	/// ─── signal buy/sell
+	_if_buy								= _var		> _var3		and _var2		> _var4		and	_var > vTsiObsPnlTFSignalEma	and	_var < _min
+	_if_sell							= _var		< _var3		and _var2		< _var4		and _var < vTsiObsPnlTFSignalEma	and	_var > _max
+	_if_condition						= _if_sell	?	' 🔴 ⬊ '	:	_if_buy	?	' 🟢 ⬈ '	:	'  '
+
+	_div								= 6
+	_fract_max							= math.round(_max - (_max / _div))
+	_fract_min							= math.ceil(_min + (_max / _div))
+
+	_cell_color							= _var >= _max ? colorTsiObsPnl_Sell : _var <= _min ? colorTsiObsPnl_Buy : colorTsiObsPnl_Neutral
+	_signal_opacity						= _var >= _max or _var <= _min ? 30 : _var >= _fract_max or _var <= _fract_min ? 40 : 65
+	_cell_text							= _title + '\n' + str.tostring(_var, '#.00') + '\n' + _if_condition
+
+	/// ─── table
+	table.cell							(vTsiPnlNewTableSignal, _col, _row, _cell_text,
+		  bgcolor						= color.new(_cell_color, _signal_opacity),
+		  text_size						= stTsiObsPnl_TextSize,
+		  text_color					= colorTsiObsPnl_TextDark,
+		  width							= 4)
+
+/// ───────────────────────
+/// ─── Visual
+/// ───────────────────────
+
+/// ─── Table Signal
+if showTsiObsPnlSignalPanel
+	if showTsiObsPnlSignalDelta
+		FunTsiObsPnlCalculateDelta		(0,	0,	'Delta',	tsiObsPnlDELTA)
+
+	if showTsiObsPnlSignalTsi
+		FunTsiObsPnlCalculateSignal		(0,	1,	'Tsi',		vTsiObsPnlTFSignalTsi,	vTsiObsPnlTFSignalTsi_2,	vTsiObsPnlTFSignalTsi_3,	vTsiObsPnlTFSignalTsi_4,	0,		100)
+	if showTsiObsPnlSignalMtf
+		FunTsiObsPnlCalculateSignal		(0,	2,	'Mtf',		vTsiObsPnlTFSignalMtf,	vTsiObsPnlTFSignalMtf_2,	vTsiObsPnlTFSignalMtf_3,	vTsiObsPnlTFSignalMtf_4,	20,		80)
+	if showTsiObsPnlSignalRsi
+		FunTsiObsPnlCalculateSignal		(0,	3,	'Rsi',		vTsiObsPnlTFSignalRsi,	vTsiObsPnlTFSignalRsi_2,	vTsiObsPnlTFSignalRsi_3,	vTsiObsPnlTFSignalRsi_4,	25,		75)
 
 
 /// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
